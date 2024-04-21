@@ -1,0 +1,14 @@
+---
+kubernetes:
+  children:
+    controllers:
+      hosts:
+        "k1":
+          ansible_user: "home-ops"
+          ansible_host: "192.168.1.41"
+        "k2":
+          ansible_user: "home-ops"
+          ansible_host: "192.168.1.42"
+        "k3":
+          ansible_user: "home-ops"
+          ansible_host: "192.168.1.43"
