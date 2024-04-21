@@ -9,9 +9,12 @@ tasks:
 
   resources:
     desc: Gather common resources in your cluster, useful when asking for support
+    summary: |
+      Args:
+        cluster: Cluster to run command against (required)
     cmds:
       - for: { var: resource }
-        cmd: kubectl get {{.ITEM}} {{.CLI_ARGS | default "-A"}}
+        cmd: kubectl --context {{.cluster}} get {{.ITEM}} {{.CLI_ARGS | default "-A"}}
     vars:
       resource: >-
         nodes
@@ -23,13 +26,13 @@ tasks:
         certificaterequests
         ingresses
         pods
+    requires:
+      vars: ["cluster"]
 
   kubeconform:
     desc: Validate Kubernetes manifests with kubeconform
-    cmd: bash {{.KUBECONFORM_SCRIPT}} {{.KUBERNETES_DIR}}
+    cmds:
+      - for: ["main","storage"]
+        cmd: bash {{.KUBECONFORM_SCRIPT}} {{.KUBERNETES_DIR}}/{{.ITEM}}
     preconditions:
       - { msg: "Missing kubeconform script", sh: "test -f {{.KUBECONFORM_SCRIPT}}" }
-
-  .reset:
-    internal: true
-    cmd: rm -rf {{.KUBERNETES_DIR}}

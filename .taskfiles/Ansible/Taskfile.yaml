@@ -4,7 +4,6 @@ version: "3"
 
 vars:
   ANSIBLE_LINT_FILE: "{{.ANSIBLE_DIR}}/.ansible-lint"
-  ANSIBLE_INVENTORY_FILE: "{{.ANSIBLE_DIR}}/inventory/hosts.yaml"
   ANSIBLE_REQUIREMENTS_FILE: "{{.ANSIBLE_DIR}}/requirements.yaml"
   ANSIBLE_PIP_REQUIREMENTS_FILE: "{{.ANSIBLE_DIR}}/requirements.txt"
 
@@ -39,50 +38,52 @@ tasks:
     desc: Run an Ansible playbook for configuring a cluster
     summary: |
       Args:
+        cluster: Cluster to run command against (required)
         playbook: Playbook to run (required)
-    prompt: Run Ansible playbook '{{.playbook}}'... continue?
+    prompt: Run Ansible playbook '{{.playbook}}' against the '{{.cluster}}' cluster... continue?
     deps: ["deps"]
-    cmd: "{{.VIRTUAL_ENV}}/bin/ansible-playbook --inventory {{.ANSIBLE_INVENTORY_FILE}} {{.ANSIBLE_DIR}}/playbooks/{{.playbook}}.yaml {{.CLI_ARGS}}"
+    cmd: "{{.VIRTUAL_ENV}}/bin/ansible-playbook --inventory {{.ANSIBLE_DIR}}/{{.cluster}}/inventory/hosts.yaml {{.ANSIBLE_DIR}}/{{.cluster}}/playbooks/{{.playbook}}.yaml {{.CLI_ARGS}}"
     requires:
-      vars: ["playbook"]
+      vars: ["cluster", "playbook"]
     preconditions:
-      - { msg: "Missing Ansible inventory file", sh: "test -f {{.ANSIBLE_INVENTORY_FILE}}" }
+      - { msg: "Missing Ansible inventory file", sh: "test -f {{.ANSIBLE_DIR}}/{{.cluster}}/inventory/hosts.yaml" }
 
   poweroff:
     desc: Shutdown all the k8s nodes
+    summary: |
+      Args:
+        cluster: Cluster to run command against (required)
     deps: ["deps"]
-    cmd: "{{.VIRTUAL_ENV}}/bin/ansible kubernetes --inventory {{.ANSIBLE_INVENTORY_FILE}} -a '/usr/bin/systemctl poweroff' --become"
+    cmd: "{{.VIRTUAL_ENV}}/bin/ansible kubernetes --inventory {{.ANSIBLE_DIR}}/{{.cluster}}/inventory/hosts.yaml -a '/usr/bin/systemctl poweroff' --become"
+    requires:
+      vars: ["cluster"]
     preconditions:
-      - { msg: "Missing Ansible inventory file", sh: "test -f {{.ANSIBLE_INVENTORY_FILE}}" }
+      - { msg: "Missing Ansible inventory file", sh: "test -f {{.ANSIBLE_DIR}}/{{.cluster}}/inventory/hosts.yaml" }
 
   list:
     desc: List all the hosts
     deps: ["deps"]
-    cmd: "{{.VIRTUAL_ENV}}/bin/ansible kubernetes --inventory {{.ANSIBLE_INVENTORY_FILE}} --list-hosts"
-    preconditions:
-      - { msg: "Missing Ansible inventory file", sh: "test -f {{.ANSIBLE_INVENTORY_FILE}}" }
+    cmds:
+      - for: ["main","storage"]
+        cmd: "{{.VIRTUAL_ENV}}/bin/ansible kubernetes --inventory {{.ANSIBLE_DIR}}/{{.ITEM}}/inventory/hosts.yaml --list-hosts"
 
   ping:
     desc: Ping all the hosts
     deps: ["deps"]
-    cmd: "{{.VIRTUAL_ENV}}/bin/ansible kubernetes --inventory {{.ANSIBLE_INVENTORY_FILE}} --one-line -m 'ping'"
-    preconditions:
-      - { msg: "Missing Ansible inventory file", sh: "test -f {{.ANSIBLE_INVENTORY_FILE}}" }
+    cmds:
+      - for: ["main","storage"]
+        cmd: "{{.VIRTUAL_ENV}}/bin/ansible kubernetes --inventory {{.ANSIBLE_DIR}}/{{.ITEM}}/inventory/hosts.yaml --one-line -m 'ping'"
 
   uptime:
     desc: Uptime of all the hosts
     deps: ["deps"]
-    cmd: "{{.VIRTUAL_ENV}}/bin/ansible kubernetes --inventory {{.ANSIBLE_INVENTORY_FILE}} --one-line -a 'uptime'"
-    preconditions:
-      - { msg: "Missing Ansible inventory file", sh: "test -f {{.ANSIBLE_INVENTORY_FILE}}" }
+    cmds:
+      - for: ["main","storage"]
+        cmd: "{{.VIRTUAL_ENV}}/bin/ansible kubernetes --inventory {{.ANSIBLE_DIR}}/{{.ITEM}}/inventory/hosts.yaml --one-line -a 'uptime'"
 
   lint:
     desc: Lint Ansible
     deps: ["deps"]
-    cmd: "{{.VIRTUAL_ENV}}/bin/ansible-lint --config-file {{.ANSIBLE_LINT_FILE}} {{.ANSIBLE_DIR}}/**/*.yaml"
+    cmd: "{{.VIRTUAL_ENV}}/bin/ansible-lint --config-file {{.ANSIBLE_LINT_FILE}} {{.ANSIBLE_DIR}}"
     preconditions:
       - { msg: "Missing Ansible lint file", sh: "test -f {{.ANSIBLE_LINT_FILE}}" }
-
-  .reset:
-    internal: true
-    cmd: rm -rf {{.ANSIBLE_DIR}}
