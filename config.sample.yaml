@@ -10,7 +10,7 @@ bootstrap_timezone: ""
 # (Required) Distribution can either be k3s or talos
 bootstrap_distribution: k3s
 
-# (Optional) Cluster name; affects Cilium and Talos
+# (Optional) Cluster name; affects Cloudflare Tunnel, Cilium and Talos
 bootstrap_cluster_name: ""
 
 # (Required: Talos) Talos Specific Options
