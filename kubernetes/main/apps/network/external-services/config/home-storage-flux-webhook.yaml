@@ -1,0 +1,33 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: home-storage-flux-webhook
+spec:
+  type: ExternalName
+  externalName: "flux-webhook.${STORAGE_DOMAIN}"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: home-storage-flux-webhook
+  annotations:
+    external-dns.alpha.kubernetes.io/target: "${SECRET_CLUSTER_NAME}.${SECRET_DOMAIN}"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/upstream-vhost: "flux-webhook.${STORAGE_DOMAIN}"
+spec:
+  ingressClassName: external
+  rules:
+    - host: &host "${STORAGE_CLUSTER_NAME}-flux-webhook.${SECRET_DOMAIN}"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: home-storage-flux-webhook
+                port:
+                  number: 443
+  tls:
+    - hosts:
+        - *host

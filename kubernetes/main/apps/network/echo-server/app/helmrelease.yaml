@@ -78,12 +78,21 @@ spec:
             interval: 1m
             scrapeTimeout: 10s
     ingress:
-      app:
+      external:
         className: external
         annotations:
           external-dns.alpha.kubernetes.io/target: "${SECRET_CLUSTER_NAME}.${SECRET_DOMAIN}"
         hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - host: "${SECRET_CLUSTER_NAME}-echo-server.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+      internal:
+        className: internal
+        hosts:
+          - host: "echo-server.${SECRET_DOMAIN}"
             paths:
               - path: /
                 service:

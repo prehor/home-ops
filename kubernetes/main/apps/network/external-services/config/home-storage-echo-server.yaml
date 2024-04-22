@@ -1,0 +1,33 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: home-storage-echo-server
+spec:
+  type: ExternalName
+  externalName: "echo-server.${STORAGE_DOMAIN}"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: home-storage-echo-server
+  annotations:
+    external-dns.alpha.kubernetes.io/target: "${SECRET_CLUSTER_NAME}.${SECRET_DOMAIN}"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/upstream-vhost: "echo-server.${STORAGE_DOMAIN}"
+spec:
+  ingressClassName: external
+  rules:
+    - host: &host "${STORAGE_CLUSTER_NAME}-echo-server.${SECRET_DOMAIN}"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: home-storage-echo-server
+                port:
+                  number: 443
+  tls:
+    - hosts:
+        - *host

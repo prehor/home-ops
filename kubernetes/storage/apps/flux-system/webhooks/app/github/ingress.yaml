@@ -3,10 +3,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: flux-webhook
-  annotations:
-    external-dns.alpha.kubernetes.io/target: "${SECRET_CLUSTER_NAME}.${SECRET_DOMAIN}"
 spec:
-  ingressClassName: external
+  ingressClassName: internal
   rules:
     - host: "flux-webhook.${SECRET_DOMAIN}"
       http:
