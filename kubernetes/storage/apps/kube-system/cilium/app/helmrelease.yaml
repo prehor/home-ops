@@ -92,7 +92,7 @@ spec:
       leaseRetryPeriod: 10s
     loadBalancer:
       algorithm: maglev
-      mode: snat
+      mode: hybrid
     localRedirectPolicy: true
     operator:
       replicas: 1
