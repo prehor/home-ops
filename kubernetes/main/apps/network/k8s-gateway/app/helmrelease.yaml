@@ -7,11 +7,11 @@ spec:
   interval: 30m
   chart:
     spec:
-      chart: k8s-gateway
-      version: 2.4.0
+      chart: app-template
+      version: 3.1.0
       sourceRef:
         kind: HelmRepository
-        name: k8s-gateway
+        name: bjw-s
         namespace: flux-system
   install:
     remediation:
@@ -21,12 +21,90 @@ spec:
     remediation:
       retries: 3
   values:
-    fullnameOverride: k8s-gateway
-    domain: "${SECRET_DOMAIN}"
-    ttl: 1
+    controllers:
+      k8s-gateway:
+        type: deployment
+        strategy: RollingUpdate
+        containers:
+          app:
+            image:
+              repository: quay.io/oriedge/k8s_gateway
+              tag: v0.4.0
+            args: ["-conf", "/etc/coredns/Corefile"]
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 8080
+                  initialDelaySeconds: 60
+                  timeoutSeconds: 5
+                  successThreshold: 1
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ready
+                    port: 8181
+                  initialDelaySeconds: 10
+                  timeoutSeconds: 5
+                  successThreshold: 1
+                  failureThreshold: 5
+    configMaps:
+      k8s-gateway:
+        data:
+          Corefile: |
+            .:1053 {
+              k8s_gateway rx.cz {
+                apex k8s-gateway.network
+                ttl 1
+              }
+              errors
+              health {
+                lameduck 5s
+              }
+              ready
+              prometheus 0.0.0.0:9153
+              forward . /etc/resolv.conf
+              cache 30
+              loop
+              reload
+              loadbalance
+            }
+            storage.rx.cz:1053 {
+              errors
+              forward . 192.168.1.19
+              cache 30
+            }
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+    persistence:
+      config:
+        type: configMap
+        name: k8s-gateway
+        globalMounts:
+          - path: /etc/coredns/Corefile
+            subPath: Corefile
+            readOnly: true
     service:
-      type: LoadBalancer
-      port: 53
-      annotations:
-        io.cilium/lb-ipam-ips: "192.168.1.49"
-      externalTrafficPolicy: Cluster
+      app:
+        controller: k8s-gateway
+        type: LoadBalancer
+        externalTrafficPolicy: Cluster
+        annotations:
+          io.cilium/lb-ipam-ips: "192.168.1.49"
+        ports:
+          dns-udp:
+            port: 53
+            protocol: UDP
+            targetPort: 1053
+            nodePort: 30584
+    serviceAccount:
+      create: true
+
