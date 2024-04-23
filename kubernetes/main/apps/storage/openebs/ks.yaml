@@ -5,11 +5,13 @@ metadata:
   name: &app openebs
   namespace: flux-system
 spec:
-  targetNamespace: openebs-system
+  targetNamespace: storage
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/main/apps/openebs-system/openebs/app
+  dependsOn:
+    - name: snapshot-controller
+  path: ./kubernetes/main/apps/storage/openebs/app
   prune: true
   sourceRef:
     kind: GitRepository

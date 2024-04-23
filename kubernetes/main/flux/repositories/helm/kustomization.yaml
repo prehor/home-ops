@@ -10,6 +10,7 @@ resources:
   - ./k8tz.yaml
   - ./jetstack.yaml
   - ./metrics-server.yaml
+  - ./openebs-zfs-localpv.yaml
   - ./openebs.yaml
   - ./piraeus.yaml
   - ./stakater.yaml
