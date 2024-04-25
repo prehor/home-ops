@@ -2,15 +2,19 @@
 # Areas
 area/ansible:
   - changed-files:
-      - any-glob-to-any-file: ansible/**/*
+      - any-glob-to-any-file:
+          - requirements.txt
+          - ansible/**/*
+          - scripts/**/*
 area/docs:
   - changed-files:
       - any-glob-to-any-file:
-          - "docs/**/*"
-          - "README.md"
+          - docs/**/*
+          - README.md
 area/github:
   - changed-files:
-      - any-glob-to-any-file: .github/**/*
+      - any-glob-to-any-file:
+          - .github/**/*
 area/kubernetes:
   - changed-files:
       - any-glob-to-any-file:
@@ -25,10 +29,10 @@ area/taskfile:
 cluster/main:
   - changed-files:
       - any-glob-to-any-file:
-          - "ansible/main/**/*"
-          - "kubernetes/main/**/*"
+          - ansible/main/**/*
+          - kubernetes/main/**/*
 cluster/storage:
   - changed-files:
       - any-glob-to-any-file:
-          - "ansible/storage/**/*"
-          - "kubernetes/storage/**/*"
+          - ansible/storage/**/*
+          - kubernetes/storage/**/*
