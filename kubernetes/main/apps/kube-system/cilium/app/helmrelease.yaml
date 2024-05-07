@@ -76,7 +76,11 @@ spec:
         ingress:
           enabled: true
           className: internal
-          hosts: ["hubble.${SECRET_DOMAIN}"]
+          hosts:
+            - &host "hubble.${SECRET_DOMAIN}"
+          tls:
+            - hosts:
+                - *host
     ipam:
       mode: kubernetes
     ipv4NativeRoutingCIDR: "${CLUSTER_CIDR}"

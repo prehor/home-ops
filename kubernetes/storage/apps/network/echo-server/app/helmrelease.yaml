@@ -81,9 +81,12 @@ spec:
       app:
         className: internal
         hosts:
-          - host: "echo-server.${SECRET_DOMAIN}"
+          - host: &host "echo-server.${SECRET_DOMAIN}"
             paths:
               - path: /
                 service:
                   identifier: app
                   port: http
+        tls:
+          - hosts:
+              - *host
