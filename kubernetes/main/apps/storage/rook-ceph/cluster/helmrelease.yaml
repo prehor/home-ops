@@ -219,7 +219,7 @@ spec:
 
     ingress:
       dashboard:
-        ingressClassName: "internal-nginx"
+        ingressClassName: "internal"
         host:
           name: &host rook.${SECRET_DOMAIN}
           path: "/"
