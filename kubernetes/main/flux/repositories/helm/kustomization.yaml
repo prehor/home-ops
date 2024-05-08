@@ -6,6 +6,7 @@ resources:
   - ./cilium.yaml
   - ./descheduler.yaml
   - ./external-dns.yaml
+  - ./external-secrets.yaml
   - ./ingress-nginx.yaml
   - ./k8s-gateway.yaml
   - ./k8tz.yaml
