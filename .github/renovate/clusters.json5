@@ -5,6 +5,7 @@
       "description": ["Separate PRs for main cluster"],
       "matchFileNames": [
         "**/kubernetes/main/**",
+        "**/kubernetes/storage/apps/storage/minio/secrets/**",
         "**/ansible/main/**",
         "**/terraform/main/**"
       ],

@@ -1,0 +1,160 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: minio
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      minio:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: quay.io/minio/minio
+              tag: RELEASE.2024-05-01T01-11-10Z
+            env:
+              MINIO_API_CORS_ALLOW_ORIGIN: "https://minio.${SECRET_DOMAIN},https://s3.${SECRET_DOMAIN}"
+              MINIO_BROWSER_REDIRECT_URL: "https://minio.${SECRET_DOMAIN}"
+              MINIO_ROOT_USER_FILE: /run/secrets/minio/MINIO_ROOT_USER
+              MINIO_ROOT_PASSWORD_FILE: /run/secrets/minio/MINIO_ROOT_PASSWORD
+              MINIO_SERVER_URL: "https://s3.${SECRET_DOMAIN}"
+              MINIO_UPDATE: "off"
+            args: ["server", "/data", "--console-address", ":9001"]
+            lifecycle:
+              postStart:
+                exec:
+                  command:
+                    - /bin/sh
+                    - -c
+                    - |
+                        (
+                          # Wait for MinIO to run
+                          # readiness = initialDelaySeconds + failureThreshold * periodSeconds * timeoutSeconds
+                          MAX_RETRIES="$((30 + 6 * 30 * 10))"
+                          RETRY_COUNT="0"
+
+                          while [ "$RETRY_COUNT" -lt "$MAX_RETRIES" ]; do
+                            curl -m 1 -o /dev/null -s http://localhost:9000/minio/health/live
+
+                            if [ $? -eq 0 ]; then
+                              echo "MinIO started in $RETRY_COUNT seconds."
+                              break
+                            else
+                              RETRY_COUNT="$((RETRY_COUNT + 1))"
+                              sleep 1 # Wait for 1 second before retrying
+                            fi
+                          done
+
+                          # Set MinIO local alias
+                          if [ "$RETRY_COUNT" -eq "$MAX_RETRIES" ]; then
+                            echo "MinIO did not start in $MAX_RETRIES seconds!"
+                          else
+                            cat /run/secrets/minio/MINIO_ROOT_PASSWORD | mc alias set local http://localhost:9000 "$(</run/secrets/minio/MINIO_ROOT_USER)"
+                          fi
+                        ) > /tmp/postStart.log 2>&1 || true
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /minio/health/live
+                    port: 9000
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 6
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 2Gi
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: FallbackToLogsOnError
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: minio
+        ports:
+          http:
+            port: 9001
+          s3:
+            port: 9000
+    serviceMonitor:
+      app:
+        serviceName: minio
+        endpoints:
+          - port: s3
+            scheme: http
+            path: /minio/v2/metrics/cluster
+            interval: 1m
+            scrapeTimeout: 10s
+    ingress:
+      app:
+        className: internal
+        hosts:
+          - host: "minio.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+          - host: "s3.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: s3
+        tls:
+          - hosts:
+              - "minio.${SECRET_DOMAIN}"
+              - "s3.${SECRET_DOMAIN}"
+    persistence:
+      data:
+        type: hostPath
+        hostPath: /srv/minio
+        hostPathType: Directory
+        globalMounts:
+          - path: /data
+      secrets:
+        type: secret
+        name: minio-secret
+        globalMounts:
+          - path: /run/secrets/minio
+            readOnly: true
+      tmp:
+        type: emptyDir
