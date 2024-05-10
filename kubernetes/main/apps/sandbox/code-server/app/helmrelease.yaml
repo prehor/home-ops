@@ -1,0 +1,96 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: code-server
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+      code-server:
+        type: deployment
+        pod:
+          annotations:
+            k8s.v1.cni.cncf.io/networks: |
+              [{
+                "name":"multus-iot",
+                "namespace": "kube-system",
+                "ips": ["192.168.101.253/24"]
+              }]
+          securityContext:
+            runAsUser: ${APP_UID:-568}
+            runAsGroup: ${APP_GID:-568}
+            fsGroup: ${APP_GID:-568}
+        containers:
+          app:
+            image:
+              repository: docker.io/codercom/code-server
+              tag: 4.23.1
+            args: [
+              "--auth", "none",
+              "--user-data-dir", "/sandbox/.vscode",
+              "--extensions-dir", "/sandbox/.vscode",
+              "--port", "80",
+              "/sandbox"
+            ]
+            lifecycle:
+              postStart:
+                exec:
+                  command:
+                    - /bin/sh
+                    - -c
+                    - >-
+                        apt update;
+                        apt install --yes dnsutils;
+                        apt install --yes iproute2;
+                        apt install --yes inetutils-ping;
+                        apt install --yes inetutils-telnet;
+                        apt install --yes inetutils-traceroute;
+                        apt install --yes net-tools;
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: FallbackToLogsOnError
+    service:
+      app:
+        controller: code-server
+        ports:
+          http:
+            port: 80
+    ingress:
+      app:
+        className: internal
+        hosts:
+          - host: &host "sandbox.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+    persistence:
+      sandbox:
+        existingClaim: code-server
+      tmp:
+        type: emptyDir

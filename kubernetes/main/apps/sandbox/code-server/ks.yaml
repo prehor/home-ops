@@ -1,0 +1,33 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app sandbox-code-server
+  namespace: flux-system
+spec:
+  targetNamespace: sandbox
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  dependsOn:
+    - name: multus
+    - name: volsync
+  path: ./kubernetes/main/apps/sandbox/code-server/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m
+  # Expand the variables in the templates included in app/kustomization.yaml
+  postBuild:
+    substitute:
+      APP: *app
+      APP_UID: "0"
+      APP_GID: "0"
+      VOLSYNC_ACCESSMODES: ReadWriteOnce
+      VOLSYNC_CAPACITY: 1Gi
+
