@@ -33,6 +33,7 @@ includes:
     taskfile: .taskfiles/Repository/Taskfile.yaml
   talos: .taskfiles/Talos/Taskfile.yaml
   sops: .taskfiles/Sops/Taskfile.yaml
+  volsync: .taskfiles/Volsync/Taskfile.yaml
   workstation: .taskfiles/Workstation/Taskfile.yaml
   user:
     taskfile: .taskfiles/User

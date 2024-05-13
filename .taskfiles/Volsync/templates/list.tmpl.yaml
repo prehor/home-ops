@@ -1,0 +1,27 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ${job}
+  namespace: ${ns}
+spec:
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      automountServiceAccountToken: false
+      restartPolicy: OnFailure
+      containers:
+        - name: minio
+          image: docker.io/restic/restic:0.16.4
+          args: ["snapshots"]
+          envFrom:
+            - secretRef:
+                name: ${app}-volsync-minio
+          resources: {}
+        - name: backblaze
+          image: docker.io/restic/restic:0.16.4
+          args: ["snapshots"]
+          envFrom:
+            - secretRef:
+                name: ${app}-volsync-backblaze
+          resources: {}

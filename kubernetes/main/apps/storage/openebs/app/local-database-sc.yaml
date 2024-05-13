@@ -11,6 +11,6 @@ parameters:
   compresion: lz4
   dedup: off
   thinprovision: yes
-  shared: no
+  shared: yes
 provisioner: zfs.csi.openebs.io
 volumeBindingMode: WaitForFirstConsumer
