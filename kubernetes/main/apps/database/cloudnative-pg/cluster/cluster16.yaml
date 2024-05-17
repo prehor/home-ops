@@ -1,0 +1,100 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres16
+spec:
+  instances: 3
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ImageCatalog
+    name: timescaledb
+    major: 16
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 10Gi
+    storageClass: local-database
+  superuserSecret:
+    name: postgres-secret
+  enableSuperuserAccess: true
+  postgresql:
+    parameters:
+      max_connections: "400"
+      shared_buffers: "256MB"
+      # ZFS tuning
+      # https://openzfs.github.io/openzfs-docs/Performance%20and%20Tuning/Workload%20Tuning.html#postgresql
+      # https://vadosware.io/post/everything-ive-seen-on-optimizing-postgres-on-zfs-on-linux/
+      # https://kubeblocks.io/blog/A-testing-report-for-optimizing-PG-performance-on-Kubernetes
+      # https://github.com/cloudnative-pg/cloudnative-pg/discussions/3058
+      # full_page_writes: "off"
+      recovery_prefetch: "try"
+      wal_init_zero: "off"
+      wal_recycle: "off"
+      wal_segment_size: "1024"
+    shared_preload_libraries:
+      - timescaledb
+  nodeMaintenanceWindow:
+    inProgress: false
+    reusePVC: true
+  resources:
+    # requests:
+    #   cpu: 500m
+    limits:
+      memory: 4Gi
+  monitoring:
+    enablePodMonitor: true
+    # https://github.com/cloudnative-pg/cloudnative-pg/issues/2501
+    podMonitorMetricRelabelings:
+      - { sourceLabels: ["cluster"], targetLabel: cnpg_cluster, action: replace }
+      - { regex: cluster, action: labeldrop }
+  backup:
+    retentionPolicy: 30d
+    barmanObjectStore: &barmanObjectStore
+      data:
+        compression: bzip2
+      wal:
+        compression: bzip2
+        maxParallel: 4
+      destinationPath: s3://home-ops-postgresql
+      endpointURL: https://s3.${STORAGE_DOMAIN}
+      # Note: serverName version needs to be inclemented
+      # when recovering from an existing cnpg cluster
+      serverName: &currentCluster postgres16-v0
+      s3Credentials:
+        accessKeyId:
+          name: cloudnative-pg-secret
+          key: MINIO_ACCESS_KEY
+        secretAccessKey:
+          name: cloudnative-pg-secret
+          key: MINIO_SECRET_KEY
+  # Note: previousCluster needs to be set to the name of the previous
+  # cluster when recovering from an existing cnpg cluster
+  bootstrap:
+    initdb:
+      # User for onedr0p/postgres-init database inital creation
+      owner: postgres-db-manager
+      # https://cloudnative-pg.io/documentation/1.19/cloudnative-pg.v1/#postgresql-cnpg-io-v1-BootstrapInitDB
+      postInitApplicationSQL:
+        # Assign Postgres DB Manager permissions
+        # https://www.atlassian.com/data/admin/how-to-change-a-user-to-superuser-in-postgresql
+        - ALTER USER postgres-db-manager WITH CREATEDB;
+        - ALTER USER postgres-db-manager WITH CREATEROLE;
+      # Enable PostGIS and TimescaleDB extensions
+      postInitTemplateSQL:
+        - CREATE EXTENSION IF NOT EXISTS postgis;
+        - CREATE EXTENSION IF NOT EXISTS postgis_topology;
+        - CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
+        - CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;
+        - CREATE EXTENSION IF NOT EXISTS timescaledb;
+        - CREATE EXTENSION IF NOT EXISTS timescaledb_toolkit;
+      secret:
+        name: postgres-secret
+  #   recovery:
+  #     source: &previousCluster postgres16-v0
+  # # Note: externalClusters is needed when recovering from an existing cnpg cluster
+  # externalClusters:
+  #   - name: *previousCluster
+  #     barmanObjectStore:
+  #       <<: *barmanObjectStore
+  #       serverName: *previousCluster
