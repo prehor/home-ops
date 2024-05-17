@@ -7,4 +7,4 @@ spec:
   images:
     - major: 16
       # renovate: datasource=docker
-      image: docker.io/timescale/timescaledb-ha:pg16.2-ts2.15.0
+      image: docker.io/timescale/timescaledb-ha:pg16.3-ts2.15.0
