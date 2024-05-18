@@ -7,7 +7,8 @@ allowVolumeExpansion: true
 parameters:
   fstype: zfs
   poolname: zroot/srv/database
-  recordsize: 16k
+  # zfs set atime=off zroot/srv/database
+  recordsize: 32k
   compresion: lz4
   dedup: off
   thinprovision: yes
