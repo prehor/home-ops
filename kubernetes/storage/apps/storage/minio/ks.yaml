@@ -2,6 +2,26 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: &app minio-kes
+  namespace: flux-system
+spec:
+  targetNamespace: storage
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  path: ./kubernetes/storage/apps/storage/minio/kes
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+  wait: false
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: &app minio
   namespace: flux-system
 spec:
@@ -9,6 +29,8 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  dependsOn:
+    - name: minio-kes
   path: ./kubernetes/storage/apps/storage/minio/app
   prune: true
   sourceRef:

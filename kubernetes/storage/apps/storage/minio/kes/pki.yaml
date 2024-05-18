@@ -1,0 +1,51 @@
+---
+# Generate a CA Certificate used to sign certificates for the minio-kes
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: minio-kes-ca-cert
+spec:
+  commonName: minio-kes-ca
+  secretName: minio-kes-ca-cert
+  duration: 43800h # 5y = 24h * 365d * 5y
+  issuerRef:
+    name: selfsigned
+    kind: ClusterIssuer
+  isCA: true
+---
+# Create an Issuer that uses the above generated CA certificate to issue certs
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: minio-kes-ca
+spec:
+  ca:
+    secretName: minio-kes-ca-cert
+---
+# Generate a minio-kes server certificate
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: minio-kes-server-cert
+spec:
+  commonName: minio-kes
+  secretName: minio-kes-server-cert
+  dnsNames:
+    - minio-kes.storage.svc.cluster.local
+  duration: 8760h # 1y = 24h * 365d
+  issuerRef:
+    name: minio-kes-ca
+    kind: Issuer
+---
+# Generate a minio client certificate
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: minio-kes-client-cert
+spec:
+  commonName: minio
+  secretName: minio-kes-client-cert
+  duration: 8760h # 1y = 24h * 365d
+  issuerRef:
+    name: minio-kes-ca
+    kind: Issuer

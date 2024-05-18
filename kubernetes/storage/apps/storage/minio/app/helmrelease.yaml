@@ -22,12 +22,15 @@ spec:
     remediation:
       strategy: rollback
       retries: 3
+  dependsOn:
+    - name: minio-kes
+      namespace: storage
   values:
     controllers:
       minio:
         type: statefulset
         annotations:
-          reloader.stakater.com/auto: "true"
+          secret.reloader.stakater.com/reload: "minio-secret,minio-kes-client-cert"
         containers:
           app:
             image:
@@ -36,6 +39,10 @@ spec:
             env:
               MINIO_API_CORS_ALLOW_ORIGIN: "https://minio.${SECRET_DOMAIN},https://s3.${SECRET_DOMAIN}"
               MINIO_BROWSER_REDIRECT_URL: "https://minio.${SECRET_DOMAIN}"
+              MINIO_KMS_KES_ENDPOINT: https://minio-kes.storage.svc.cluster.local:7373
+              MINIO_KMS_KES_CERT_FILE: /run/secrets/client-cert/tls.crt
+              MINIO_KMS_KES_KEY_FILE: /run/secrets/client-cert/tls.key
+              MINIO_KMS_KES_KEY_NAME: minio
               MINIO_ROOT_USER_FILE: /run/secrets/minio/MINIO_ROOT_USER
               MINIO_ROOT_PASSWORD_FILE: /run/secrets/minio/MINIO_ROOT_PASSWORD
               MINIO_SERVER_URL: "https://s3.${SECRET_DOMAIN}"
@@ -95,8 +102,6 @@ spec:
                 cpu: 100m
               limits:
                 memory: 2Gi
-            terminationMessagePath: /dev/termination-log
-            terminationMessagePolicy: FallbackToLogsOnError
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -145,15 +150,28 @@ spec:
     persistence:
       data:
         type: hostPath
-        hostPath: /srv/minio
+        hostPath: /srv/minio/data
         hostPathType: Directory
         globalMounts:
           - path: /data
-      secrets:
+      secret:
         type: secret
         name: minio-secret
         globalMounts:
           - path: /run/secrets/minio
+            readOnly: true
+      ca-cert:
+        type: secret
+        name: minio-kes-client-cert
+        globalMounts:
+          - path: /etc/ssl/certs/minio-kes-ca.crt
+            subPath: ca.crt
+            readOnly: true
+      client-cert:
+        type: secret
+        name: minio-kes-client-cert
+        globalMounts:
+          - path: /run/secrets/client-cert
             readOnly: true
       tmp:
         type: emptyDir

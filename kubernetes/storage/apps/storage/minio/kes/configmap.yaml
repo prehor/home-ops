@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minio-kes-config
+type: Opaque
+data:
+  server-config.yaml: |-
+    # https://github.com/minio/kes/blob/master/server-config.yaml
+    version: v1
+    address: 0.0.0.0:7373
+    tls:
+      cert: /run/secrets/server-cert/tls.crt
+      key: /run/secrets/server-cert/tls.key
+    admin:
+      identity: disabled
+    api:
+      /v1/metrics:
+        skip_auth: false
+        timeout:   15s
+      /v1/ready:
+        skip_auth: false
+        timeout:   15s
+      /v1/status:
+        skip_auth: false
+        timeout:   15s
+    policy:
+      minio:
+        allow:
+        - /v1/key/create/*
+        - /v1/key/generate/*
+        - /v1/key/decrypt/*
+        - /v1/key/bulk/decrypt/*
+        - /v1/key/list/*
+        - /v1/log/audit
+        - /v1/log/error
+        - /v1/metrics
+        - /v1/ready
+        - /v1/status
+        identities:
+        - "$${MINIO_KMS_KES_IDENTITY}"
+    log:
+      error: debug
+      audit: debug
+    keystore:
+      fs:
+        path: "/run/secrets/keystore"

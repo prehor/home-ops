@@ -1,0 +1,122 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: minio-kes
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      minio-kes:
+        type: deployment
+        replicas: 2
+        strategy: RollingUpdate
+        annotations:
+          configmap.reloader.stakater.com/reload: "minio-kes-config"
+          secret.reloader.stakater.com/reload: "minio-kes-keystore,minio-kes-client-cert,minio-kes-server-cert"
+        containers:
+          app:
+            image:
+              repository: docker.io/minio/kes
+              tag: 2024-04-12T13-50-00Z
+            command: ["/bin/sh","-c"]
+            args: |
+              set -ex
+              export MINIO_KMS_KES_IDENTITY="$(/kes identity of /run/secrets/client-cert/tls.crt)"
+              exec /kes server --config /run/configmaps/minio-kes/server-config.yaml
+            # probes:
+            #   liveness: &probes
+            #     enabled: true
+            #     custom: true
+            #     type: HTTPS
+            #     spec:
+            #       httpGet:
+            #         path: /v1/ready
+            #         port: 7373
+            #       initialDelaySeconds: 30
+            #       periodSeconds: 30
+            #       timeoutSeconds: 10
+            #       failureThreshold: 6
+            #   readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: minio-kes
+        ports:
+          kes:
+            port: 7373
+    # serviceMonitor:
+    #   app:
+    #     serviceName: minio-kes
+    #     endpoints:
+    #       - port: kes
+    #         scheme: https
+    #         path: /v1/metrics
+    #         interval: 1m
+    #         scrapeTimeout: 10s
+    persistence:
+      config:
+        type: configMap
+        name: minio-kes-config
+        globalMounts:
+          - path: /run/configmaps/minio-kes
+            readOnly: true
+      keystore:
+        type: hostPath
+        hostPath: /srv/minio/keystore
+        hostPathType: Directory
+        globalMounts:
+          - path: /run/secrets/keystore
+      ca-cert:
+        type: secret
+        name: minio-kes-client-cert
+        globalMounts:
+          - path: /etc/ssl/certs/minio-kes-ca.crt
+            subPath: ca.crt
+            readOnly: true
+      client-cert:
+        type: secret
+        name: minio-kes-client-cert
+        globalMounts:
+          - path: /run/secrets/client-cert/tls.crt
+            subPath: tls.crt
+            readOnly: true
+      server-cert:
+        type: secret
+        name: minio-kes-server-cert
+        globalMounts:
+          - path: /run/secrets/server-cert
+            readOnly: true
+      tmp:
+        type: emptyDir
