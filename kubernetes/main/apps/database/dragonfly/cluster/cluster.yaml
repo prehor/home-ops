@@ -20,7 +20,7 @@ spec:
     - --lock_on_hashtags
   authentication:
     passwordFromSecret:
-      name: dragonfly-secret
+      name: redis-secret
       key: password
   resources:
     requests:
