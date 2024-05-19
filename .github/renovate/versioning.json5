@@ -6,6 +6,13 @@
       "matchDatasources": ["github-releases"],
       "versioning": "regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?<compatibility>\\+k.s)\\.?(?<build>\\d+)$",
       "matchPackagePatterns": ["k3s"]
+    },
+    {
+      "description": ["Use custom versioning for TimescaleDB"],
+      "matchDatasources": ["docker"],
+      // https://docs.renovatebot.com/modules/versioning/#regular-expression-versioning
+      "versioning": "regex:^(?<major>\\d+)(-(?<minor>\\d+)\\.(?<patch>\\d+)(-(?<build>\\d+))?)?$",
+      "matchPackagePatterns": ["timescaledb"]
     }
   ]
 }
