@@ -21,6 +21,7 @@
   "suppressNotifications": ["prEditedNotification", "prIgnoreNotification"],
   "rebaseWhen": "conflicted",
   "schedule": ["on friday and saturday"],
+  "ignorePaths": ["**/*.sops.*"],
   "flux": {
     "fileMatch": [
       "(^|/)ansible/.+\\.ya?ml$",
