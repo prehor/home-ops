@@ -79,10 +79,6 @@ spec:
             env:
               - name: SKIP_CNI_BINARIES
                 value: "bandwidth,bridge,firewall,flannel,host-device,host-local,ipvlan,loopback,portmap,ptp,sbr,vlan,vrf" # macvlan,tuning
-            resources:
-              requests:
-                cpu: "10m"
-                memory: "15Mi"
             securityContext:
               capabilities:
                 drop:
@@ -95,10 +91,6 @@ spec:
             args: |
               set -x
               cp /usr/src/multus-cni/bin/multus-shim /host/opt/cni/bin/multus-shim
-            resources:
-              requests:
-                cpu: "10m"
-                memory: "15Mi"
             securityContext:
               capabilities:
                 drop:

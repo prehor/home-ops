@@ -24,6 +24,6 @@ spec:
       key: password
   resources:
     requests:
-      cpu: 100m
+      cpu: 20m
     limits:
       memory: 512Mi

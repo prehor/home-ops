@@ -69,7 +69,7 @@ spec:
       resources:
         mgr:
           requests:
-            cpu: "100m"
+            cpu: "50m"
             memory: "512Mi"
           limits:
             memory: "2Gi"
@@ -81,7 +81,7 @@ spec:
             memory: "1Gi"
         osd:
           requests:
-            cpu: "500m"
+            cpu: "50m"
             memory: "2Gi"
           limits:
             memory: "6Gi"
@@ -105,7 +105,7 @@ spec:
             memory: "1Gi"
         cleanup:
           requests:
-            cpu: "100m"
+            cpu: "50m"
             memory: "100Mi"
           limits:
             memory: "1Gi"
@@ -159,7 +159,7 @@ spec:
             priorityClassName: system-cluster-critical
             resources:
               requests:
-                cpu: "100m"
+                cpu: "20m"
                 memory: "1Gi"
               limits:
                 memory: "3Gi"
@@ -203,7 +203,7 @@ spec:
             port: 80
             resources:
               requests:
-                cpu: 100m
+                cpu: 20m
                 memory: 256Mi
               limits:
                 memory: 2Gi

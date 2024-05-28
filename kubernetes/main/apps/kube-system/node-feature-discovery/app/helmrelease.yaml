@@ -28,19 +28,15 @@ spec:
     master:
       resources:
         requests:
-          cpu: 21m
-          memory: 51Mi
+          memory: 32Mi
         limits:
-          memory: 51Mi
+          memory: 64Mi
     worker:
       config:
         core:
           sources: ["pci", "system", "usb"]
       resources:
-        requests:
-          cpu: 5m
-          memory: 48Mi
         limits:
-          memory: 48Mi
+          memory: 64Mi
     prometheus:
       enable: true
