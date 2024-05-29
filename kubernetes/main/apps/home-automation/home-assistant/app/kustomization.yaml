@@ -7,6 +7,7 @@ resources:
   - ./config-deploy-key.sops.yaml
   - ./config-secret.sops.yaml
   - ./config-secret.yaml
+  - ./postgres-dburl-secret.yaml
   - ./postgres-initdb-secret.yaml
   - ./postgres-secret.sops.yaml
   - ../../../../templates/volsync
