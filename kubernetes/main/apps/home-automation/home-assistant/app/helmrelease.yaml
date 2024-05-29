@@ -43,22 +43,6 @@ spec:
             envFrom:
               - secretRef:
                   name: home-assistant-secret
-            # lifecycle:
-            #   postStart: &poststart
-            #     exec:
-            #       command:
-            #         - /bin/sh
-            #         - -c
-            #         - |
-            #             (
-            #               set -x
-            #               # Prepare ssh keys
-            #               mkdir -p ~/.ssh
-            #               ln -sf /var/run/secrets/config-deploy-key/ssh-privatekey ~/.ssh/id_$(cat /var/run/secrets/config-deploy-key/ssh-privatekey-type)
-            #               cp /var/run/secrets/config-deploy-key/known-hosts ~/.ssh/known_hosts
-            #               chown $(id -u):$(id -g) ~/.ssh/known_hosts
-            #               chmod 0400 ~/.ssh/known_hosts
-            #             ) > /tmp/postStart.log 2>&1
             probes:
               liveness: &probes
                 custom: true
@@ -100,12 +84,6 @@ spec:
               pwd
               ls -lRat /config
               if [ ! -e "/config/.git" ]; then
-                # Prepare ssh keys
-                rm -rf /root/.ssh
-                mkdir -p /root/.ssh
-                ln -sf /var/run/secrets/config-deploy-key/ssh-privatekey /root/.ssh/id_$(cat /var/run/secrets/config-deploy-key/ssh-privatekey-type)
-                cp /var/run/secrets/config-deploy-key/known-hosts /root/.ssh/known_hosts
-                # Clone hass-config repository
                 git clone git@github.com:prehor/hass-config.git /config/.hass-config
                 mv /config/.hass-config/* /config/.hass-config/.* /config
                 rmdir /config/.hass-config/
@@ -144,7 +122,7 @@ spec:
     ingress:
       app:
         enabled: true
-        className: "internal-nginx"
+        className: internal
         hosts:
           - host: hass.${SECRET_DOMAIN}
             paths:
@@ -160,7 +138,10 @@ spec:
         name: home-assistant-config-deploy-key
         defaultMode: 0o400
         globalMounts:
-          - path: /run/secrets/config-deploy-key
+          - path: /root/.ssh/id_ed25519
+            subPath: ssh-privatekey
+          - path: /root/.ssh/known_hosts2
+            subPath: ssh-known-hosts
       logs:
         type: emptyDir
         globalMounts:
