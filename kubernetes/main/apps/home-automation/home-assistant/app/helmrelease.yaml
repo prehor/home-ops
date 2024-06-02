@@ -1,0 +1,133 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app home-assistant
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.2.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: external-secrets
+      namespace: security
+    - name: multus
+      namespace: kube-system
+    - name: volsync
+      namespace: storage
+  values:
+    controllers:
+      home-assistant:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/home-assistant/home-assistant
+              tag: 2024.5.5
+            envFrom:
+              - secretRef:
+                  name: home-assistant-secret
+            probes:
+              liveness: &probes
+                custom: true
+                spec:
+                  httpGet:
+                    path: /manifest.json
+                    port: 8123
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup: *probes
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 2Gi
+        initContainers:
+          recorder-initdb:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16
+            envFrom:
+              - secretRef:
+                  name: home-assistant-postgres-recorder-initdb
+          config:
+            image:
+              repository: docker.io/alpine/git
+              tag: 2.45.1
+            command: ["/bin/sh","-c"]
+            args: |
+              set -ex
+              env | sort
+              pwd
+              ls -lRat /config
+              if [ ! -e "/config/.git" ]; then
+                git clone git@github.com:prehor/hass-config.git /config/.hass-config
+                mv /config/.hass-config/* /config/.hass-config/.* /config
+                rmdir /config/.hass-config/
+              fi
+        pod:
+          annotations:
+            k8s.v1.cni.cncf.io/networks: |
+              [{
+                "name":"multus-iot",
+                "namespace": "kube-system",
+                "ips": ["192.168.101.254/24"]
+              }]
+    service:
+      app:
+        controller: home-assistant
+        ports:
+          http:
+            port: 8123
+    ingress:
+      app:
+        enabled: true
+        className: internal
+        hosts:
+          - host: hass.${SECRET_DOMAIN}
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+    persistence:
+      config:
+        existingClaim: *app
+      deploy-key:
+        type: secret
+        name: home-assistant-config-deploy-key
+        defaultMode: 0o400
+        globalMounts:
+          - path: /root/.ssh/id_ed25519
+            subPath: ssh-privatekey
+          - path: /root/.ssh/known_hosts2
+            subPath: ssh-known-hosts
+      logs:
+        type: emptyDir
+        globalMounts:
+          - path: /config/logs
+      tts:
+        type: emptyDir
+        globalMounts:
+          - path: /config/tts
+      tmp:
+        type: emptyDir

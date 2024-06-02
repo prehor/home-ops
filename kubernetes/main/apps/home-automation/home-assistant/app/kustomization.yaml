@@ -1,0 +1,13 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./helmrelease.yaml
+  - ./config-deploy-key.sops.yaml
+  - ./config-secret.sops.yaml
+  - ./config-secret.yaml
+  - ./postgres-dburl-secret.yaml
+  - ./postgres-recorder-initdb-secret.yaml
+  - ./postgres-recorder-secret.sops.yaml
+  - ../../../../templates/volsync
