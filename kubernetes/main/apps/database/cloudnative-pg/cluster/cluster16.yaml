@@ -77,8 +77,7 @@ spec:
       secret:
         name: postgres-secret
       postInitApplicationSQL:
-        - ALTER USER "postgres-db-manager" WITH CREATEDB;
-        - ALTER USER "postgres-db-manager" WITH CREATEROLE;
+        - ALTER USER "postgres-db-manager" WITH SUPERUSER;
       # ZFS tuning
       walSegmentSize: 1024
   #   recovery:
