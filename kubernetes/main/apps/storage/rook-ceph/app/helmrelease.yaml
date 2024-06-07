@@ -25,6 +25,7 @@ spec:
     - name: snapshot-controller
   values:
     csi:
+      enableCephfsDriver: false
       enableLiveness: true
       serviceMonitor:
         enabled: true
