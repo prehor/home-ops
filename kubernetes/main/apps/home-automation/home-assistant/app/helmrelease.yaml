@@ -77,9 +77,6 @@ spec:
             command: ["/bin/sh","-c"]
             args: |
               set -ex
-              env | sort
-              pwd
-              ls -lRat /config
               if [ ! -e "/config/.git" ]; then
                 git clone git@github.com:prehor/hass-config.git /config/.hass-config
                 mv /config/.hass-config/* /config/.hass-config/.* /config
