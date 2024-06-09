@@ -45,6 +45,7 @@ spec:
                   name: home-assistant-secret
             probes:
               liveness: &probes
+                enabled: true
                 custom: true
                 spec:
                   httpGet:
