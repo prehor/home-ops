@@ -6,7 +6,7 @@ metadata:
 data:
   config.yaml: |
     devices:
-      - name: nabu-casa-skyconnect
+      - name: nabucasa-skyconnect
         groups:
           - usb:
               - product: "ea60"
