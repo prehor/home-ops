@@ -32,12 +32,12 @@ spec:
       namespace: storage
   values:
     defaultPodOptions:
+      annotations:
+        reloader.stakater.com/auto: "true"
       nodeSelector:
         nabucasa.feature.node.kubernetes.io/skyconnect: "true"
     controllers:
       home-assistant:
-        annotations:
-          reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
