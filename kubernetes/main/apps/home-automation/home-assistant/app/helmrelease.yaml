@@ -77,7 +77,7 @@ spec:
           config:
             image:
               repository: docker.io/alpine/git
-              tag: 2.45.1
+              tag: 2.45.2
             command: ["/bin/sh","-c"]
             args: |
               set -ex
