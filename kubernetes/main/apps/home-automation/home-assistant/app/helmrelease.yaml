@@ -33,6 +33,12 @@ spec:
   values:
     defaultPodOptions:
       annotations:
+        k8s.v1.cni.cncf.io/networks: |
+          [{
+            "name":"multus-iot",
+            "namespace": "kube-system",
+            "ips": ["192.168.101.254/24"]
+          }]
         reloader.stakater.com/auto: "true"
       nodeSelector:
         nabucasa.feature.node.kubernetes.io/skyconnect: "true"
@@ -62,10 +68,50 @@ spec:
               startup: *probes
             resources:
               requests:
-                cpu: 10m
+                cpu: 100m
+                memory: 512Mi
               limits:
-                device/nabucasa-skyconnect: 1
+                cpu: 2000m
                 memory: 2Gi
+                device/nabucasa-skyconnect: 1
+          code-server:
+            image:
+              repository: ghcr.io/coder/code-server
+              tag: 4.21.1
+            args: [
+              "--auth", "none",
+              "--user-data-dir", "/config/.vscode",
+              "--extensions-dir", "/config/.vscode",
+              "--port", "80",
+              "/config"
+            ]
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                cpu: 1000m
+                memory: 2Gi
+            securityContext:
+              runAsUser: 0
+              runAsGroup: 0
+            lifecycle:
+              postStart:
+                exec:
+                  command:
+                    - /bin/sh
+                    - -c
+                    - |
+                        (
+                          set -ex
+                          apt update
+                          apt install --yes dnsutils
+                          apt install --yes iproute2
+                          apt install --yes inetutils-ping
+                          apt install --yes inetutils-telnet
+                          apt install --yes inetutils-traceroute
+                          apt install --yes net-tools
+                        ) > /tmp/postStart.log 2>&1 || true
         initContainers:
           recorder-initdb:
             image:
@@ -86,31 +132,40 @@ spec:
                 mv /config/.hass-config/* /config/.hass-config/.* /config
                 rmdir /config/.hass-config/
               fi
-        pod:
-          annotations:
-            k8s.v1.cni.cncf.io/networks: |
-              [{
-                "name":"multus-iot",
-                "namespace": "kube-system",
-                "ips": ["192.168.101.254/24"]
-              }]
     service:
       app:
         controller: home-assistant
         ports:
           http:
             port: 8123
+          code-server:
+            port: 80
     ingress:
       app:
         enabled: true
         className: internal
         hosts:
-          - host: hass.${SECRET_DOMAIN}
+          - host: &host hass.${SECRET_DOMAIN}
             paths:
               - path: /
                 service:
                   identifier: app
                   port: http
+        tls:
+          - hosts:
+              - *host
+      code-server:
+        className: internal
+        hosts:
+          - host: &host "hash.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: code-server
+        tls:
+          - hosts:
+              - *host
     persistence:
       config:
         existingClaim: *app
