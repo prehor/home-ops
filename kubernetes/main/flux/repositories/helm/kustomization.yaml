@@ -6,6 +6,7 @@ resources:
   - ./bjw-s.yaml
   - ./cilium.yaml
   - ./cloudnative-pg.yaml
+  - ./cluster-proportional-autoscaler.yaml
   - ./descheduler.yaml
   - ./emqx.yaml
   - ./external-dns.yaml
