@@ -9,8 +9,10 @@ kubeconfig
 *.pub
 *.key
 # Private
-.private
+.archive
 .bin
+.private
+TODO.md
 # Ansible
 .venv*
 # Taskfile
