@@ -11,6 +11,7 @@ spec:
     kind: ImageCatalog
     name: timescaledb
     major: 16
+  primaryUpdateMethod: switchover
   primaryUpdateStrategy: unsupervised
   storage:
     size: 15Gi
