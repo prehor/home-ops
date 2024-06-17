@@ -40,8 +40,6 @@ spec:
             "ips": ["192.168.101.254/24"]
           }]
         reloader.stakater.com/auto: "true"
-      nodeSelector:
-        nabucasa.feature.node.kubernetes.io/skyconnect: "true"
     controllers:
       home-assistant:
         containers:
@@ -73,7 +71,6 @@ spec:
               limits:
                 cpu: 2000m
                 memory: 2Gi
-                device/nabucasa-skyconnect: 1
           code-server:
             image:
               repository: ghcr.io/coder/code-server
