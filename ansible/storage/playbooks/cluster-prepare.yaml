@@ -24,7 +24,7 @@
             name: apt-transport-https,ca-certificates,conntrack,curl,dirmngr,gdisk,gnupg,hdparm,htop,
               iptables,iputils-ping,ipvsadm,libseccomp2,lm-sensors,net-tools,nfs-common,
               nvme-cli,open-iscsi,parted,psmisc,python3,python3-apt,python3-kubernetes,python3-yaml,
-              smartmontools,socat,software-properties-common,unzip,util-linux
+              smartmontools,socat,software-properties-common,unzip,usbip,util-linux
             install_recommends: false
 
     - name: Network Configuration
@@ -95,6 +95,59 @@
               fs.inotify.max_user_instances: 8192
               net.core.rmem_max: 2500000
               net.core.wmem_max: 2500000
+
+    - name: Usbip Configuration
+      block:
+        - name: Usbip Configuration | Add /etc/systemd/system/usbipd.service
+          ansible.builtin.copy:
+            dest: "/etc/systemd/system/usbipd.service"
+            mode: "0644"
+            content: |
+              [Unit]
+              Description=USB over IP Host Daemon
+              After=network.target
+
+              [Service]
+              Type=simple
+              User=root
+              Group=root
+              UMask=027
+              ExecStart=/usr/sbin/usbipd --ipv4
+              Restart=on-failure
+
+              [Install]
+              WantedBy=multi-user.target
+          register: usbip_usbipd_service_status
+        - name: Usbip Configuration | Restart Usbip service # noqa: no-changed-when no-handler
+          when: usbip_usbipd_service_status.changed
+          ansible.builtin.systemd:
+            name: usbipd.service
+            enabled: true
+            daemon_reload: true
+            state: restarted
+        - name: Usbip Configuration | Update udev rules /etc/udev/rules.d/91-usbip-server-tools.rules
+          ansible.builtin.copy:
+            dest: "/etc/udev/rules.d/91-usbip-server-tools.rules"
+            force: false
+            mode: "0644"
+            content: |
+              # Nabu Casa SkyConnect
+              SUBSYSTEM=="usb" \
+              , ACTION=="add" \
+              , ATTRS{idVendor}=="10c4" \
+              , ATTRS{idProduct}=="ea60" \
+              , ATTRS{manufacturer}=="Nabu Casa" \
+              , ATTRS{product}=="SkyConnect v1.0" \
+              , RUN+="/usr/sbin/usbip bind -b %k"
+          register: usbip_udev_rules_status
+        - name: Usbip Configuration | Reload Usbip udev rules # noqa: no-changed-when no-handler
+          when: usbip_udev_rules_status.changed
+          ansible.builtin.command:
+            cmd: "/usr/bin/udevadm control --reload-rules"
+        - name: Usbip Configuration | Trigger usbadm # noqa: no-changed-when no-handler
+          when: usbip_udev_rules_status.changed
+          ansible.builtin.command:
+            cmd: "/usr/bin/udevadm trigger"
 
   handlers:
     - name: Reboot
