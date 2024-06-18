@@ -98,6 +98,7 @@
 
   handlers:
     - name: Reboot
+      throttle: 1
       ansible.builtin.reboot:
         msg: Rebooting hosts
         reboot_timeout: 3600
