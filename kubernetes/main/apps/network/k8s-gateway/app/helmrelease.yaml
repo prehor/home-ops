@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: k8s-gateway
+  name: &app k8s-gateway
 spec:
   interval: 30m
   chart:
@@ -24,6 +24,7 @@ spec:
     controllers:
       k8s-gateway:
         type: deployment
+        replicas: 3
         strategy: RollingUpdate
         containers:
           app:
@@ -81,6 +82,15 @@ spec:
               cache 30
             }
     defaultPodOptions:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: *app
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
