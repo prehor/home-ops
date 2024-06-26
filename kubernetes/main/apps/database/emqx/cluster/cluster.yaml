@@ -28,28 +28,28 @@ spec:
   bootstrapAPIKeys:
     - secretRef:
         key:
-          secretName: mqtt-secret
           secretKey: username
+          secretName: emqx-secret
         secret:
-          secretName: mqtt-secret
           secretKey: password
+          secretName: emqx-secret
   coreTemplate:
     metadata:
       annotations:
-        secret.reloader.stakater.com/reload: "emqx-secret,mqtt-secret"
+        secret.reloader.stakater.com/reload: "emqx-dashboard-secret,emqx-secret"
     spec:
       replicas: 3
       env:
         - name: EMQX_DASHBOARD__DEFAULT_USERNAME
           valueFrom:
             secretKeyRef:
-              name: emqx-secret
               key: username
+              name: emqx-dashboard-secret
         - name: EMQX_DASHBOARD__DEFAULT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: emqx-secret
               key: password
+              name: emqx-dashboard-secret
       volumeClaimTemplates:
         storageClassName: local-generic
         resources:
