@@ -13,9 +13,10 @@ rules:
     resources:
       - secrets
     resourceNames:
+      - ebusd-emqx-secret
       - home-assistant-config-secret
+      - home-assistant-emqx-secret
       - home-assistant-postgres-dburl
-      - home-assistant-postgres-recorder-initdb
       - home-assistant-postgres-recorder-secret
     verbs:
       - get
