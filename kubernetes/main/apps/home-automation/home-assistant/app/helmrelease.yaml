@@ -24,6 +24,10 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
+    - name: postgres-operator
+      namespace: database
+    - name: emqx-operator
+      namespace: database
     - name: external-secrets
       namespace: security
     - name: multus

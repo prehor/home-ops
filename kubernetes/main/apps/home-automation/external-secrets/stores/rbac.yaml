@@ -13,7 +13,7 @@ rules:
     resources:
       - secrets
     resourceNames:
-      - ebusd-emqx-secret
+      - ebusd-config-secret
       - home-assistant-config-secret
       - home-assistant-emqx-secret
       - home-assistant-postgres-dburl

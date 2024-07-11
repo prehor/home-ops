@@ -1,0 +1,232 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app ebusd
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.2.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: emqx-operator
+      namespace: database
+    - name: external-secrets
+      namespace: security
+    - name: multus
+      namespace: kube-system
+    - name: volsync
+      namespace: storage
+  values:
+    defaultPodOptions:
+      annotations:
+        secret.reloader.stakater.com/reload: "ebusd-emqx-init,ebusd-secret"
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    controllers:
+      ebusd:
+        containers:
+          app:
+            image:
+              repository: docker.io/john30/ebusd
+              tag: &version v23.3
+            command: ["ebusd"]
+            args:
+              # https://github.com/john30/ebusd/wiki/2.-Run
+              # Message Configuration Options
+              - --configpath=/config/latest/en
+              - --configlang=en
+              - --pollinterval=10
+              - --scanconfig
+              # Daemon Options
+              - --foreground
+              # HTTP Client
+              - --httpport=8080
+              - --htmlpath=/config/html
+              # Log Options
+              - --log=all:notice
+              # MQTT Options
+              - --mqttint=/config/mqtt-hassio.cfg
+              - --mqttjson
+            envFrom:
+              - secretRef:
+                  name: ebusd-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /data/global
+                    port: 8080
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup: *probes
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                cpu: 2000m
+                memory: 2Gi
+          code-server:
+            image:
+              repository: ghcr.io/coder/code-server
+              tag: 4.90.3
+            args:
+              - --auth=none
+              - --user-data-dir=/config/.vscode
+              - --extensions-dir=/config/.vscode
+              - --port=80
+              - /config"
+            envFrom:
+              - secretRef:
+                  name: ebusd-secret
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                cpu: 1000m
+                memory: 2Gi
+            lifecycle:
+              postStart:
+                exec:
+                  command:
+                    - /bin/sh
+                    - -c
+                    - |
+                        (
+                          set -ex
+
+                          # Install packages
+                          sudo apt update
+                          sudo apt install --yes dnsutils
+                          sudo apt install --yes iproute2
+                          sudo apt install --yes inetutils-ping
+                          sudo apt install --yes inetutils-telnet
+                          sudo apt install --yes inetutils-traceroute
+                          sudo apt install --yes net-tools
+
+                          # Setup git
+                          git config --global user.name "$${GITCONFIG_USER_NAME}"
+                          git config --global user.email "$${GITCONFIG_USER_MAIL}"
+                          git config --global branch.autosetuprebase always
+                          git config --global --add safe.directory '/config'
+                        ) > /tmp/postStart.log 2>&1 || true
+        initContainers:
+          config:
+            image:
+              repository: ghcr.io/prehor/alpine-toolbox
+              tag: 3.20.1
+            args:
+              - /entrypoint.sh
+              - /bin/bash
+              - -c
+              - |
+                  set -ex
+
+                  # Clone ebusd-config repository
+                  if [ ! -e "/config/.git" ]; then
+                    git clone git@github.com:prehor/ebusd-config.git /config/.ebusd-config
+                    mv /config/.ebusd-config/* /config/.ebusd-config/.* /config
+                    rmdir /config/.ebusd-config/
+                  fi
+
+                  # Fetch mqtt-hassio.cfg
+                  if [ ! -e "/config/mqtt-hassio.cfg" ]; then
+                    curl https://raw.githubusercontent.com/john30/ebusd/master/contrib/etc/ebusd/mqtt-hassio.cfg -o /config/mqtt-hassio.cfg
+                  fi
+
+                  # Fetch contrib/html
+                  if [ ! -e "/config/html/.ebus-$${EBUSD_VERSION#v}" ]; then
+                    mkdir -p /config/html
+                    rm -rf /config/html/*
+                    (
+                      cd /config/html
+                      curl -L https://github.com/john30/ebusd/archive/refs/tags/$${EBUSD_VERSION#v}.tar.gz |
+                      tar xfvz - --strip-components=3 ebusd-$${EBUSD_VERSION#v}/contrib/html
+                    )
+                    touch /config/html/.ebus-$${EBUSD_VERSION#v}
+                  fi
+            env:
+              EBUSD_VERSION: *version
+            envFrom:
+              - secretRef:
+                  name: ebusd-secret
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+          emqx-init:
+            image:
+              repository: ghcr.io/prehor/emqx-init
+              tag: 1.0.0
+            envFrom:
+              - secretRef:
+                  name: ebusd-emqx-init
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+    service:
+      app:
+        controller: ebusd
+        ports:
+          code-server:
+            port: 80
+    ingress:
+      code-server:
+        className: internal
+        hosts:
+          - host: &host "ebush.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: code-server
+        tls:
+          - hosts:
+              - *host
+    persistence:
+      config:
+        existingClaim: *app
+      deploy-key:
+        type: secret
+        name: ebusd-config-deploy-key
+        globalMounts:
+          - path: /config/.ssh/id_ed25519
+            subPath: ssh-privatekey
+          - path: /config/.ssh/known_hosts2
+            subPath: ssh-known-hosts
+      tmp:
+        type: emptyDir

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: ebusd-config-deploy-key
+type: kubernetes.io/ssh-auth
+stringData:
+    ssh-privatekey: ENC[AES256_GCM,data:FgLKm8XNvj7PisZNng0vJ9sd3qHMfKRmoP4vDuy93cusYV7HmR+zI4hM1lZ93lHC5flj20OqW1MSIBkclrRuB95hMFl8o9gfYNrph0MCTk192FbMFYD0K4MDrXYtWXMdv+cg6WLYahBeiCObK69DjzewD3RritiDZLLW5sgR/U1DGSBiFgGxfkC0Qc22r6IzY0fb6qu0/5GKIFRCdO11HKp9AIRPheiAaBRSiZRHtXcvdfNwzoOCeNf6TXyVeDhDrX8hTOzTMrsDVq85+NeTF3cMjdoSjv/q2Qbq8xasFcYh1Uk95qAv7ufIDFBvYkPLHVmQR8GdMUif1T/OH/AwvkiW8s3BVNrXI13yzd4A9MUdGuic+fhR26WTBbPqgM/QBUoPFGxaJEmoQNvX4eQrXfzs2ukyu+EDPCshcS8Xb9cuX8nbUzX9RAcnYYKhRzPofSEWhOrSZjW/5DoBcqJ9vwVi0I4YWGBzTl51dzM1Be0piO4G7pVZJTL1YqNgRmGxc8/YTLb7e51sry5A32vG1OTlJnkeeLCRdrJTzaMKhgVs0fU=,iv:nuh1/y4b9pdacvKiaGHctrZjP9nfMmF21fea2hc4tCQ=,tag:/Hzw+9TS/ghbOZwnsxTPsg==,type:str]
+    ssh-privatekey-type: ENC[AES256_GCM,data:7ArBiHJgrw==,iv:HARFrYhoAvM1CjbUUQh9/nMtRll8nIEprjn33Gsk4Jc=,tag:BvfzrVLaz8yBCj5f8CMDYw==,type:str]
+    ssh-known-hosts: ENC[AES256_GCM,data:QOBt7z+ErV81bhnZKZzOJLlxH3hePo54XvXa5t9enJq56Ei8hUEwpUNW1M+bcDQmRn7XvjtQr9RB796Dh0rLYBGn0QzvilOL22ZHLYq0FurD/lhhRq9YUXjd0TBttkW2xssSVj8Aq9ZM+ym01tBU2xjrVpxmqo0ktVDlogx60CYjPw38phHEuTNNkLFcBQKWvZXCltTA/S34rM1vK+vAhrMSMZk00jLOMJ69JmVbfkWI+hmB/MPNpz+HIVXfGHfpn8sedMjkhPvbsp8z3dGRDcbwAcE4lrHrZIjyDO882FMJ+2v+PZACtvI49n9k8ihquFRrsBkPbc0WnnOCSbq4+MGh4XvBHQdNFgsYV8zf206BVzENOKF661Ds++Rz6ytjguiols482r1yziBR6L1/AnXze95oNd5dGUzYEvXN+Hl60/t2dwOzjeBCYn6ekw0PRpYE970kCA31I1KavepUaeIBtxCn7GFAhYVWEwQFI7MyR77K6a7TbsdDukfkHww8XjcoQSm+/5XSsLAbBoqqPv8f2LcwV2YXkDX8KrwlNPZoxghH1rFXzhTEKg1ErUJNt96nAJ3cr4kfsyWnq3aA6cyimoRjdhW4JPbx13ubuz4b19Fu/9sKxGJG8akJU+1Bz8KXLV9uJjOQO91qi5+dDk1w8Hvu9GX3wnS0EiaCLh8tVNDDdtdtATUPS+MZEkMVFTGYfW0auRR2nfoPyTJgpvtRxi7dToxKpA67jacj+j4NQRwm0sKamwDN0xBWfENeuaZ/NHbFWzC+xssZmSeA/FRTPmdEpLQQ8jcG+MI9Fc8xnd+Ydz/GCv6TdWPazww0C6X4ERTBk5eo9BEMAjDo8jF9A5aRDThgx/rxeDz01G0JgYzDR1rPZWJLTpHenJOx6sjzRQukHHi1dK0aMaP9JNfuARAgx0/H4/xxRRsV6QTd6H7rbsMxPyXQMMeAjM9t1l0cnhxglR/wUiW6GJi3LnfXDvRVx2KQDetO605zI6O4ZDUtEgTNlZ2PotZ42/hhDRF56GmhF5z8XU1KLEhVG0N0rZXxB5NmNQtHbu5Wx9qpUHe7YgTvAHIbUzkvf4VZ0sTxuxMNYvXONEEu,iv:SG9Rjm6OO69IVNtdE6wtdqApW0svCUTYHtMH1/FxluA=,tag:+Zuaf+b7LaOlOUlgKyb0IA==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1ve9kzacrwq7l9l0emvs326uk6t576d75r596e083r2tq6xu28qcsacy3s7
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBzL2FNUlZqWFFtUGRPUE5o
+            Rm0zNmplVE9ocTVaQ3V4OFRwRDJXVkF2MEJjCjBZS1Y3RFFXcHVZQmU4ejV6QTlT
+            QVh0bXZzNy9aTTllQ1FaRGtwM25SaDgKLS0tIDd0U2Y1MU5oL0RsUjg0UHZleC9D
+            aVNLZzdlbmFHVXVQMldXa0VvRHJoU0EKWzThM5A/IjS4XBvmxHZFr3pywKitjbfK
+            CKnctMdz2AcJ224TUl6PEc7GVZdCycHZn9nK2zP6tcY8bPlX4VBP4Q==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-06-30T20:07:02Z"
+    mac: ENC[AES256_GCM,data:03LjoWfq3vWeQ2Fs24WDW6E4T/5WnRvdGmPuiVVWEqqpyn0qnAz92MIMPc7B7TCy6XzQ31GqacjK2dxM3o4sSAqET+yotpOOhTVRnxarJWOre8uzDK/8LnYzP3Jbd7DpueCTXNRkomk9OLMYElp8HRszbWr1rEVj4UG/nfCY1y4=,iv:WemTKSYH2Hp3m6JT9LMrlKXUkdcwDzEwLmXboAaZ0mc=,tag:x1iXanJE/PnlETI54gR+8g==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.8.1
