@@ -141,7 +141,7 @@ spec:
           config:
             image:
               repository: ghcr.io/prehor/alpine-toolbox
-              tag: 3.20.1
+              tag: 3.20.2
             args:
               - /entrypoint.sh
               - /bin/bash
