@@ -27,7 +27,7 @@ spec:
       replicaCount: 2
       service:
         annotations:
-          io.cilium/lb-ipam-ips: "192.168.1.47"
+          lbipam.cilium.io/ips: "192.168.1.47"
         externalTrafficPolicy: Cluster
       ingressClassResource:
         name: internal
