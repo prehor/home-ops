@@ -19,7 +19,12 @@ tasks:
       - kubectl --context {{.cluster}} apply --server-side --filename https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/{{.PROMETHEUS_OPERATOR_VERSION}}/example/prometheus-operator-crd/monitoring.coreos.com_scrapeconfigs.yaml
       - kubectl --context {{.cluster}} apply --server-side --filename https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/{{.PROMETHEUS_OPERATOR_VERSION}}/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
       - kubectl --context {{.cluster}} apply --server-side --kustomize {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/flux
-      - cat {{.AGE_FILE}} | kubectl --context {{.cluster}} -n flux-system create secret generic sops-age --from-file=age.agekey=/dev/stdin
+      - |
+        if ! kubectl --context {{.cluster}} -n flux-system get secret sops-age >/dev/null 2>&1; then
+          cat {{.AGE_FILE}} | kubectl --context {{.cluster}} -n flux-system create secret generic sops-age --from-file=age.agekey=/dev/stdin
+        else
+          echo "sops-age secret already exists, skipping creation."
+        fi
       - sops --decrypt {{.KUBERNETES_DIR}}/github-deploy-key.sops.yaml | kubectl --context {{.cluster}} apply --server-side --filename -
       - sops --decrypt {{.KUBERNETES_DIR}}/{{.cluster}}/flux/vars/cluster-secrets.sops.yaml | kubectl --context {{.cluster}} apply --server-side --filename -
       - kubectl --context {{.cluster}} apply --server-side --filename {{.KUBERNETES_DIR}}/{{.cluster}}/flux/vars/cluster-settings.yaml
