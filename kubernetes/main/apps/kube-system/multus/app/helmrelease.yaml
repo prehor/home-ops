@@ -64,11 +64,10 @@ spec:
                     fieldPath: spec.nodeName
             resources:
               requests:
-                cpu: "5m"
-                memory: "96Mi"
+                cpu: 10m
+                memory: 128Mi
               limits:
-                cpu: "100m"
-                memory: "96Mi"
+                memory: 128Mi
             securityContext:
               privileged: true
         initContainers:

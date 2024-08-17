@@ -69,46 +69,46 @@ spec:
       resources:
         mgr:
           requests:
-            cpu: "50m"
-            memory: "512Mi"
+            cpu: 50m
+            memory: 512Mi
           limits:
-            memory: "2Gi"
+            memory: 2Gi
         mon:
           requests:
-            cpu: "50m"
-            memory: "512Mi"
+            cpu: 50m
+            memory: 512Mi
           limits:
-            memory: "6Gi"
+            memory: 6Gi
         osd:
           requests:
-            cpu: "50m"
-            memory: "2Gi"
+            cpu: 50m
+            memory: 2Gi
           limits:
-            memory: "6Gi"
+            memory: 6Gi
         mgr-sidecar:
           requests:
-            cpu: "50m"
-            memory: "128Mi"
+            cpu: 50m
+            memory: 128Mi
           limits:
-            memory: "256Mi"
+            memory: 256Mi
         crashcollector:
           requests:
-            cpu: "15m"
-            memory: "64Mi"
+            cpu: 15m
+            memory: 64Mi
           limits:
-            memory: "64Mi"
+            memory: 64Mi
         logcollector:
           requests:
-            cpu: "50m"
-            memory: "100Mi"
+            cpu: 50m
+            memory: 100Mi
           limits:
-            memory: "1Gi"
+            memory: 1Gi
         cleanup:
           requests:
-            cpu: "50m"
-            memory: "100Mi"
+            cpu: 50m
+            memory: 100Mi
           limits:
-            memory: "1Gi"
+            memory: 1Gi
 
     cephBlockPools:
       - name: ceph-blockpool
@@ -159,10 +159,10 @@ spec:
     #         priorityClassName: system-cluster-critical
     #         resources:
     #           requests:
-    #             cpu: "20m"
-    #             memory: "1Gi"
+    #             cpu: 20m
+    #             memory: 1Gi
     #           limits:
-    #             memory: "3Gi"
+    #             memory: 3Gi
     #     storageClass:
     #       enabled: true
     #       isDefault: false

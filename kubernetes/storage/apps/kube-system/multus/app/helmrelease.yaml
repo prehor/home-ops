@@ -64,10 +64,10 @@ spec:
                     fieldPath: spec.nodeName
             resources:
               requests:
-                cpu: "5m"
-                memory: "96Mi"
+                cpu: 10m
+                memory: 128Mi
               limits:
-                memory: "96Mi"
+                memory: 128Mi
             securityContext:
               privileged: true
         initContainers:
@@ -80,8 +80,10 @@ spec:
                 value: "bandwidth,bridge,firewall,flannel,host-device,host-local,ipvlan,loopback,portmap,ptp,sbr,vlan,vrf" # macvlan,tuning
             resources:
               requests:
-                cpu: "10m"
-                memory: "15Mi"
+                cpu: 10m
+                memory: 15Mi
+              limits:
+                memory: 15Mi
             securityContext:
               capabilities:
                 drop:
@@ -96,8 +98,10 @@ spec:
               cp /usr/src/multus-cni/bin/multus-shim /host/opt/cni/bin/multus-shim
             resources:
               requests:
-                cpu: "10m"
-                memory: "15Mi"
+                cpu: 10m
+                memory: 15Mi
+              limits:
+                memory: 15Mi
             securityContext:
               capabilities:
                 drop:

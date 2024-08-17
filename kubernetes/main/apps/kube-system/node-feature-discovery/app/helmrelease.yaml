@@ -28,7 +28,8 @@ spec:
     master:
       resources:
         requests:
-          memory: 32Mi
+          cpu: 10m
+          memory: 64Mi
         limits:
           memory: 64Mi
     worker:
@@ -36,6 +37,9 @@ spec:
         core:
           sources: ["pci", "system", "usb"]
       resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
         limits:
           memory: 64Mi
     prometheus:
