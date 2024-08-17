@@ -12,5 +12,6 @@ resources:
   - ./metrics-server.yaml
   - ./openebs-zfs-localpv.yaml
   - ./openebs.yaml
+  - ./prometheus-community.yaml
   - ./piraeus.yaml
   - ./stakater.yaml

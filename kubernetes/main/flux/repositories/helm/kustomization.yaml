@@ -19,6 +19,7 @@ resources:
   - ./node-feature-discovery.yaml
   - ./openebs-zfs-localpv.yaml
   - ./openebs.yaml
+  - ./prometheus-community.yaml
   - ./rook-ceph.yaml
   - ./piraeus.yaml
   - ./stakater.yaml
