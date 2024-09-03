@@ -7,4 +7,4 @@ spec:
   images:
     - major: 16
       # renovate: datasource=docker
-      image: ghcr.io/imusmanmalik/timescaledb-postgis:16-3.4-57
+      image: ghcr.io/imusmanmalik/timescaledb-postgis:16-3.4-62
