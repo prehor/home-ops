@@ -219,10 +219,22 @@ spec:
       deploy-key:
         type: secret
         name: ebusd-config-deploy-key
-        globalMounts:
-          - path: /config/.ssh/id_ed25519
-            subPath: ssh-privatekey
-          - path: /config/.ssh/known_hosts2
-            subPath: ssh-known-hosts
+        advancedMounts:
+          ebusd:
+            app:
+              - path: /.ssh/id_ed25519
+                subPath: ssh-privatekey
+              - path: /.ssh/known_hosts2
+                subPath: ssh-known-hosts
+            code-server:
+                - path: /home/coder/.ssh/id_ed25519
+                  subPath: ssh-privatekey
+                - path: /home/coder/.ssh/known_hosts2
+                  subPath: ssh-known-hosts
+            config:
+              - path: /config/.ssh/id_ed25519
+                subPath: ssh-privatekey
+              - path: /config/.ssh/known_hosts2
+                subPath: ssh-known-hosts
       tmp:
         type: emptyDir
