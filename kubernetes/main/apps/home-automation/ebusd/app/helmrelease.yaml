@@ -53,6 +53,8 @@ spec:
             command: ["ebusd"]
             args:
               # https://github.com/john30/ebusd/wiki/2.-Run
+              # Device Options
+              - --latency=100   # ebusctl info min latency=20 ms max latency=40 ms
               # Message Configuration Options
               - --configpath=/config/latest/en
               - --configlang=en
