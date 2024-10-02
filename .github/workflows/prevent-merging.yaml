@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: "Prevent Merging"
+
+on:
+  pull_request:
+    types: [synchronize, opened, reopened, labeled, unlabeled]
+
+jobs:
+  prevent-merging:
+    if: ${{ startsWith(github.event.*.labels.*.name, 'hold/') }}
+    name: Prevent Merging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check hold/* labels
+        run: |
+          echo "Pull request is labeled as 'hold/*'"
+          echo "This workflow fails so that the pull request cannot be merged"
+          exit 1
