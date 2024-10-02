@@ -35,28 +35,20 @@ spec:
     - name: volsync
       namespace: storage
   values:
-    defaultPodOptions:
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 1
-              preference:
-                matchExpressions:
-                  - key: nabucasa.feature.node.kubernetes.io/skyconnect
-                    operator: Exists
-      annotations:
-        k8s.v1.cni.cncf.io/networks: |
-          [{
-            "name":"multus-iot",
-            "namespace": "kube-system",
-            "ips": ["192.168.101.254/24"]
-          }]
-        secret.reloader.stakater.com/reload: "home-assistant-emqx-init,home-assistant-secret"
-      securityContext:
-        runAsUser: 0
-        runAsGroup: 0
     controllers:
       home-assistant:
+        pod:
+          annotations:
+            k8s.v1.cni.cncf.io/networks: |
+              [{
+                "name":"multus-iot",
+                "namespace": "kube-system",
+                "ips": ["192.168.101.254/24"]
+              }]
+            secret.reloader.stakater.com/reload: "home-assistant-emqx-init,home-assistant-secret"
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
         containers:
           app:
             image:
@@ -146,20 +138,6 @@ spec:
                 mv /config/.hass-config/* /config/.hass-config/.* /config
                 rmdir /config/.hass-config/
               fi
-          usbip-attach:
-            image:
-              repository: ghcr.io/prehor/usbip
-              tag: 6.6.31
-            restartPolicy: Always  # Sidecar container
-            env:
-              USBIP_HOST: h1.${SECRET_DOMAIN}
-            lifecycle:
-              preStop:
-                exec:
-                  command:
-                    - /entrypoint.sh --detach
-            securityContext:
-              privileged: true
     service:
       app:
         controller: home-assistant
@@ -206,20 +184,6 @@ spec:
             subPath: ssh-privatekey
           - path: /root/.ssh/known_hosts2
             subPath: ssh-known-hosts
-      host-dev:
-        type: hostPath
-        hostPath: /dev
-        globalMounts:
-          - path: /dev
-            mountPropagation: HostToContainer
-      host-sys:
-        type: hostPath
-        hostPath: /sys
-        advancedMounts:
-          home-assistant:
-            usbip-attach:
-              - path: /sys
-                mountPropagation: Bidirectional
       logs:
         type: emptyDir
         globalMounts:

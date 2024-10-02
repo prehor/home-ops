@@ -16,7 +16,6 @@ resources:
   - ./k8tz.yaml
   - ./jetstack.yaml
   - ./metrics-server.yaml
-  - ./node-feature-discovery.yaml
   - ./openebs-zfs-localpv.yaml
   - ./openebs.yaml
   - ./prometheus-community.yaml
