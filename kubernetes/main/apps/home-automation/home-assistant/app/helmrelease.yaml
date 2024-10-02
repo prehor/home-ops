@@ -51,7 +51,7 @@ spec:
             runAsGroup: 0
         containers:
           app:
-            image:
+            image: &home-assistant-image
               repository: ghcr.io/home-assistant/home-assistant
               tag: 2024.9.3
             envFrom:
@@ -78,7 +78,7 @@ spec:
               limits:
                 memory: 2Gi
           code-server:
-            image:
+            image: &code-server-image
               repository: ghcr.io/coder/code-server
               tag: 4.92.2
             args: [
@@ -113,21 +113,21 @@ spec:
                         ) > /tmp/postStart.log 2>&1 || true
         initContainers:
           emqx-init:
-            image:
+            image: &emqx-init-image
               repository: ghcr.io/prehor/emqx-init
               tag: 1.0.0
             envFrom:
               - secretRef:
                   name: home-assistant-emqx-init
-          recorder-initdb:
-            image:
+          recorder-init:
+            image: &recorder-init-image
               repository: ghcr.io/onedr0p/postgres-init
               tag: 16
             envFrom:
               - secretRef:
                   name: home-assistant-postgres-recorder-initdb
-          config:
-            image:
+          config-init:
+            image: &config-init-image
               repository: docker.io/alpine/git
               tag: 2.45.2
             command: ["/bin/sh","-c"]
@@ -138,6 +138,38 @@ spec:
                 mv /config/.hass-config/* /config/.hass-config/.* /config
                 rmdir /config/.hass-config/
               fi
+      preload-images:
+        type: job
+        annotations:
+          helm.sh/hook: pre-install,pre-upgrade
+        job:
+          ttlSecondsAfterFinished: 600
+        pod:
+          restartPolicy: Never
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+        containers:
+          home-assistant:
+            image:
+              <<: *home-assistant-image
+            command: ['/bin/true']
+          code-server:
+            image:
+              <<: *code-server-image
+            command: ['/bin/true']
+          emqx-init:
+            image:
+              <<: *emqx-init-image
+            command: ['/bin/true']
+          recorder-init:
+            image:
+              <<: *recorder-init-image
+            command: ['/bin/true']
+          config-init:
+            image:
+              <<: *config-init-image
+            command: ['/bin/true']
     service:
       app:
         controller: home-assistant
