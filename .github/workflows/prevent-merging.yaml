@@ -8,12 +8,12 @@ on:
 
 jobs:
   prevent-merging:
-    if: ${{ startsWith(github.event.*.labels.*.name, 'hold/') }}
     name: Prevent Merging
     runs-on: ubuntu-latest
     steps:
-      - name: Check hold/* labels
-        run: |
-          echo "Pull request is labeled as 'hold/*'"
-          echo "This workflow fails so that the pull request cannot be merged"
-          exit 1
+      - uses: mheap/github-action-required-labels@v5.4.2
+        with:
+          count: 0
+          mode: exactly
+          labels: ^hold/
+          use_regex: true
