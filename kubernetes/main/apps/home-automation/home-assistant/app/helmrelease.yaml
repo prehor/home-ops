@@ -145,6 +145,15 @@ spec:
         job:
           ttlSecondsAfterFinished: 600
         pod:
+          affinity:
+            podAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 1
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: *app
+                    topologyKey: kubernetes.io/hostname
           restartPolicy: Never
           securityContext:
             runAsUser: 568
