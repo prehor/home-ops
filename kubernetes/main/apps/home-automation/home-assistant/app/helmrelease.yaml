@@ -207,6 +207,12 @@ spec:
     persistence:
       config:
         existingClaim: *app
+        advancedMounts:
+          ebusd:
+            app:
+              - path: /config
+            config-init:
+              - path: /config
       deploy-key:
         type: secret
         name: home-assistant-config-deploy-key
@@ -218,11 +224,15 @@ spec:
             subPath: ssh-known-hosts
       logs:
         type: emptyDir
-        globalMounts:
-          - path: /config/logs
+        advancedMounts:
+          ebusd:
+            app:
+              - path: /config/logs
       tts:
         type: emptyDir
-        globalMounts:
-          - path: /config/tts
+        advancedMounts:
+          ebusd:
+            app:
+              - path: /config/tts
       tmp:
         type: emptyDir
