@@ -208,7 +208,7 @@ spec:
       config:
         existingClaim: *app
         advancedMounts:
-          ebusd:
+          home-assistant:
             app:
               - path: /config
             config-init:
@@ -225,13 +225,13 @@ spec:
       logs:
         type: emptyDir
         advancedMounts:
-          ebusd:
+          home-assistant:
             app:
               - path: /config/logs
       tts:
         type: emptyDir
         advancedMounts:
-          ebusd:
+          home-assistant:
             app:
               - path: /config/tts
       tmp:
