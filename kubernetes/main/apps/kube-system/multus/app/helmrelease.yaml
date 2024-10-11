@@ -89,6 +89,7 @@ spec:
             command: ["/bin/sh","-c"]
             args: |
               set -x
+              rm -f /host/opt/cni/bin/multus-shim
               cp /usr/src/multus-cni/bin/multus-shim /host/opt/cni/bin/multus-shim
             securityContext:
               capabilities:
