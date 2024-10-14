@@ -220,6 +220,8 @@ spec:
           home-assistant:
             app:
               - path: /config
+            code-server:
+              - path: /config
             config-init:
               - path: /config
       deploy-key:
