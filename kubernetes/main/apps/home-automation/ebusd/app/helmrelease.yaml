@@ -233,6 +233,8 @@ spec:
             image:
               <<: *emqx-init-image
             command: ['/bin/true']
+        serviceAccount:
+          name: default
     service:
       app:
         controller: ebusd

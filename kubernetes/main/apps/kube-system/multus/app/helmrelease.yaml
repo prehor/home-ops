@@ -119,6 +119,8 @@ spec:
           multus-shim-installer:
             image: *multus-cni-image
             command: ['/bin/true']
+        serviceAccount:
+          name: default
     defaultPod:
       tolerations:
         - operator: Exists
