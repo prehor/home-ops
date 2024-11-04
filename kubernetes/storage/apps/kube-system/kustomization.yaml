@@ -8,5 +8,5 @@ resources:
   - ./k8tz/ks.yaml
   - ./kube-vip/ks.yaml
   - ./metrics-server/ks.yaml
-  # - ./multus/ks.yaml
+  - ./multus/ks.yaml
   - ./reloader/ks.yaml
