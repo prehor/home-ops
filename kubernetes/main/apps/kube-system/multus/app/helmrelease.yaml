@@ -32,7 +32,7 @@ spec:
             {
               "cniVersion": "0.3.1",
               "logToStderr": true,
-              "binDir": "/var/lib/rancher/k3s/data/current/bin",
+              "binDir": "/var/lib/rancher/k3s/data/cni",
               "chrootDir": "/hostroot",
               "confDir": "/host/etc/cni/net.d",
               "cniConfigDir": "/host/etc/cni/net.d",
@@ -47,7 +47,6 @@ spec:
           hostNetwork: true
           hostPID: true
           terminationGracePeriodSeconds: 10
-        # TODO: v1.31.2+k3s1 change CNI bin location https://github.com/k3s-io/k3s/issues/10928
         containers:
           multus-daemon:
             image: &multus-cni-image
@@ -69,7 +68,7 @@ spec:
           cni-plugins-installer:
             image: &hardened-cni-plugins-image
               repository: docker.io/rancher/hardened-cni-plugins
-              tag: v1.5.1-build20241009   # Current version used in k3s v1.31.1+k3s1
+              tag: v1.5.1-build20241009   # Current version used in k3s v1.31.2+k3s1
             env:
               - name: SKIP_CNI_BINARIES
                 value: "bandwidth,bridge,firewall,flannel,host-device,host-local,ipvlan,loopback,portmap,ptp,sbr,vlan,vrf" # macvlan,tuning
@@ -137,7 +136,7 @@ spec:
               - path: /host/etc/cni/net.d
       cnibin:
         type: hostPath
-        hostPath: /var/lib/rancher/k3s/data/current/bin
+        hostPath: /var/lib/rancher/k3s/data/cni
         advancedMounts:
           multus:
             cni-plugins-installer:
@@ -149,7 +148,7 @@ spec:
               # e.g. if the cni bin is in '/opt/cni/bin' on the container host side, then it should be
               # mount to '/opt/cni/bin' in multus-daemon, not to any other directory, like '/opt/bin' or
               # '/usr/bin'.
-              - path: /var/lib/rancher/k3s/data/current/bin
+              - path: /var/lib/rancher/k3s/data/cni
       config:
         type: configMap
         name: multus-daemon-config
