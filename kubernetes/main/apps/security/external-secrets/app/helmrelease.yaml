@@ -23,6 +23,8 @@ spec:
       retries: 3
   values:
     installCRDs: true
+    log:
+      level: debug
     serviceMonitor:
       enabled: true
       interval: 1m
