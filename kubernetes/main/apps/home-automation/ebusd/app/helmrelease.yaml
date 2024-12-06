@@ -54,9 +54,9 @@ spec:
             args:
               # https://github.com/john30/ebusd/wiki/2.-Run
               # Device Options
-              # - --latency=20   # ebusctl info min latency=20 ms max latency=40 ms
+              - --latency=40   # ebusctl info: min latency=0 ms max latency=27 ms
               # Message Configuration Options
-              - --configpath=/config/latest/en
+              # - --configpath=/config/latest/en  # default: https://ebus.github.io/
               - --configlang=en
               - --pollinterval=10
               - --scanconfig
