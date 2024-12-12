@@ -129,7 +129,7 @@ spec:
           config-init:
             image: &config-init-image
               repository: docker.io/alpine/git
-              tag: 2.45.2
+              tag: v2.47.1
             command: ["/bin/sh","-c"]
             args: |
               set -ex
