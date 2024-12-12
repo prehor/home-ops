@@ -11,7 +11,7 @@ jobs:
     name: Prevent Merging
     runs-on: ubuntu-latest
     steps:
-      - uses: mheap/github-action-required-labels@v5.4.2
+      - uses: mheap/github-action-required-labels@5.5.0
         with:
           count: 0
           mode: exactly
