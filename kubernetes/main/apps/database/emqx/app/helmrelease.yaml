@@ -29,7 +29,6 @@ spec:
     fullnameOverride: emqx
     image:
       repository: ghcr.io/emqx/emqx-operator
-    revisionHistoryLimit: 0
     resources:
       requests:
         cpu: 10m

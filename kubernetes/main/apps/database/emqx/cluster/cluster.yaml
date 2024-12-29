@@ -6,6 +6,7 @@ metadata:
   name: emqx
 spec:
   image: public.ecr.aws/emqx/emqx:5.8.4
+  revisionHistoryLimit: 0
   config:
     data: |
       authentication {
