@@ -215,6 +215,11 @@ spec:
         tls:
           - hosts:
               - *host
+    configMaps:
+      # https://github.com/home-assistant/core/issues/127966#issuecomment-2539017518
+      dockerenv:
+        data:
+          dockerenv: ""
     persistence:
       config:
         existingClaim: *app
@@ -235,6 +240,15 @@ spec:
             subPath: ssh-privatekey
           - path: /root/.ssh/known_hosts2
             subPath: ssh-known-hosts
+      # https://github.com/home-assistant/core/issues/127966#issuecomment-2539017518
+      dockerenv:
+        type: configMap
+        name: home-assistant-dockerenv
+        advancedMounts:
+          home-assistant:
+            app:
+              - path: /.dockerenv
+                subPath: dockerenv
       logs:
         type: emptyDir
         advancedMounts:
