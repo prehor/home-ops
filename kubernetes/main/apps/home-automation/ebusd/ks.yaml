@@ -27,3 +27,4 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 100Mi
+      VOLSYNC_CACHE_CAPACITY: 100Mi
