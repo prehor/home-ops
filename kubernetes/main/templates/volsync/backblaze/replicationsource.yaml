@@ -23,5 +23,5 @@ spec:
     pruneIntervalDays: 7
     retain:
       daily: 7
-    unlock: "${VOLSYNC_UNLOCK:-false}"
+    unlock: "${VOLSYNC_UNLOCK:-never}"
 
