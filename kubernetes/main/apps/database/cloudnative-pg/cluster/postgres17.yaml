@@ -54,7 +54,7 @@ spec:
       endpointURL: https://s3.${STORAGE_DOMAIN}
       # Note: serverName version needs to be incremented
       # when recovering from an existing cnpg cluster
-      serverName: &currentCluster postgres17-v0
+      serverName: &currentCluster postgres17-v1
       s3Credentials:
         accessKeyId:
           name: postgres-cluster-secret
@@ -63,6 +63,7 @@ spec:
           name: postgres-cluster-secret
           key: MINIO_SECRET_KEY
   bootstrap:
+    ### Initialize new cluster
     initdb:
       # The postgres-db-manager user will be used to create databases using onedr0p/postgres-init
       database: postgres-db-manager
@@ -71,31 +72,31 @@ spec:
         name: postgres-secret
       postInitApplicationSQL:
         - ALTER USER "postgres-db-manager" WITH SUPERUSER;
-      # Import databases from previous major version cluster
-      import:
-        type: monolith
-        databases:
-          - '*'
-        roles:
-          - '*'
-        source:
-          externalCluster: &previousCluster postgres16
       # ZFS tuning
       walSegmentSize: 1024
-    # # Recover from previous cluster barman backup
+    #   ### Import databases from previous major version cluster
+    #   import:
+    #     type: monolith
+    #     databases:
+    #       - '*'
+    #     roles:
+    #       - '*'
+    #     source:
+    #       externalCluster: &previousCluster postgres16
+    ### Recover from previous cluster barman backup
     # recovery:
-    #   source: &previousCluster postgres16
-  externalClusters:
-    - name: *previousCluster
-      connectionParameters:
-        host: postgres16-rw.database.svc.cluster.local
-        user: postgres
-        dbname: postgres
-      password:
-        name: postgres-cluster-secret
-        key: password
-      # # Note: serverName version needs to be set to the version of the
-      # # previous cluster when recovering from an existing cnpg cluster
-      # barmanObjectStore:
-      #   <<: *barmanObjectStore
-      #   serverName: postgres16-v0
+    #   source: &previousCluster postgres16-v0
+  # externalClusters:
+  #   - name: *previousCluster
+  #     ### Import databases from previous major version cluster
+  #     # connectionParameters:
+  #     #   host: postgres17-rw.database.svc.cluster.local
+  #     #   user: postgres
+  #     #   dbname: postgres
+  #     # password:
+  #     #   name: postgres-cluster-secret
+  #     #   key: password
+  #     ### Recover from previous cluster barman backup
+  #     # barmanObjectStore:
+  #     #   <<: *barmanObjectStore
+  #     #   serverName: *previousCluster
