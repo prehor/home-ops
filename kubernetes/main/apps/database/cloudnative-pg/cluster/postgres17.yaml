@@ -42,8 +42,10 @@ spec:
       - { sourceLabels: ["cluster"], targetLabel: cnpg_cluster, action: replace }
       - { regex: cluster, action: labeldrop }
   backup:
-    retentionPolicy: 30d
     barmanObjectStore: &barmanObjectStore
+      # Note: serverName version needs to be incremented
+      # when recovering from an existing cnpg cluster
+      serverName: &currentCluster postgres17-v1
       data:
         compression: bzip2
         encryption: AES256
@@ -52,9 +54,6 @@ spec:
         encryption: AES256
       destinationPath: s3://home-ops-postgresql
       endpointURL: https://s3.${STORAGE_DOMAIN}
-      # Note: serverName version needs to be incremented
-      # when recovering from an existing cnpg cluster
-      serverName: &currentCluster postgres17-v1
       s3Credentials:
         accessKeyId:
           name: postgres-cluster-secret
@@ -62,6 +61,7 @@ spec:
         secretAccessKey:
           name: postgres-cluster-secret
           key: MINIO_SECRET_KEY
+    retentionPolicy: "30d"
   bootstrap:
     ### Initialize new cluster
     initdb:
