@@ -162,23 +162,28 @@ spec:
           home-assistant:
             image:
               <<: *home-assistant-image
-            command: ['/bin/true']
+            command: ['/bin/sleep']
+            args: ['10']
           code-server:
             image:
               <<: *code-server-image
-            command: ['/bin/true']
+            command: ['/bin/sleep']
+            args: ['10']
           emqx-init:
             image:
               <<: *emqx-init-image
-            command: ['/bin/true']
+            command: ['/bin/sleep']
+            args: ['10']
           recorder-init:
             image:
               <<: *recorder-init-image
-            command: ['/bin/true']
+            command: ['/bin/sleep']
+            args: ['10']
           config-init:
             image:
               <<: *config-init-image
-            command: ['/bin/true']
+            command: ['/bin/sleep']
+            args: ['10']
         serviceAccount:
           name: default
     service:
