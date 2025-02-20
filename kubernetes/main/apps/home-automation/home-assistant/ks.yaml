@@ -10,11 +10,19 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  components:
+    - ../../../../components/volsync
   dependsOn:
     - name: home-automation-external-secrets-stores
     - name: multus
     - name: volsync
   path: "./kubernetes/main/apps/home-automation/home-assistant/app"
+  postBuild:
+    substitute:
+      APP: *app
+      VOLSYNC_CAPACITY: 5Gi
+      VOLSYNC_CACHE_CAPACITY: 2Gi
+      VOLSYNC_UNLOCK: "2025-01-12-002"
   prune: true
   sourceRef:
     kind: GitRepository
@@ -23,10 +31,4 @@ spec:
   interval: 30m
   retryInterval: 1m
   timeout: 5m
-  postBuild:
-    substitute:
-      APP: *app
-      VOLSYNC_CAPACITY: 5Gi
-      VOLSYNC_CACHE_CAPACITY: 5Gi
-      VOLSYNC_UNLOCK: "2025-01-12-002"
 

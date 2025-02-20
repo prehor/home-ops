@@ -3,17 +3,17 @@
 apiVersion: volsync.backube/v1alpha1
 kind: ReplicationSource
 metadata:
-  name: "${APP}-minio"
+  name: "${APP}-backblaze"
 spec:
   sourcePVC: "${APP}"
   trigger:
-    schedule: "0 * * * *"
+    schedule: "0 0 * * *"
   restic:
     copyMethod: Snapshot
-    repository: ${APP}-volsync-minio
+    repository: ${APP}-volsync-backblaze
     cacheStorageClassName: "${VOLSYNC_CACHE_SNAPSHOTCLASS:-local-generic}"
     cacheAccessModes: ["${VOLSYNC_CACHE_ACCESSMODES:-ReadWriteOnce}"]
-    cacheCapacity: "${VOLSYNC_CACHE_CAPACITY:-1Gi}"
+    cacheCapacity: "${VOLSYNC_CACHE_CAPACITY:-512Mi}"
     storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-block}"
     volumeSnapshotClassName: "${VOLSYNC_SNAPSHOTCLASS:-csi-ceph-blockpool}"
     moverSecurityContext:
@@ -22,7 +22,6 @@ spec:
       fsGroup: ${APP_GID:-568}
     pruneIntervalDays: 7
     retain:
-      hourly: 24
       daily: 7
-      weekly: 5
     unlock: "${VOLSYNC_UNLOCK:-never}"
+

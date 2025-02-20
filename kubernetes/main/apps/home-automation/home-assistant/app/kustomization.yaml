@@ -12,4 +12,3 @@ resources:
   - ./postgres-recorder-initdb-secret.yaml
   - ./postgres-recorder-secret.sops.yaml
   - ./secret.yaml
-  - ../../../../templates/volsync
