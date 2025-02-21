@@ -6,3 +6,4 @@ resources:
   - ./ebusd/ks.yaml
   - ./external-secrets/ks.yaml
   - ./home-assistant/ks.yaml
+  - ./zigbee2mqtt/ks.yaml

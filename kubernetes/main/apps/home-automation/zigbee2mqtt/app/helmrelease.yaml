@@ -1,0 +1,185 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: zigbee2mqtt
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: emqx-operator
+      namespace: database
+    - name: external-secrets
+      namespace: security
+    - name: volsync
+      namespace: storage
+  values:
+    controllers:
+      zigbee2mqtt:
+        annotations:
+          secret.reloader.stakater.com/reload: "zigbee2mqtt-emqx-init,zigbee2mqtt-secret"
+        containers:
+          app:
+            image: &zigbee2mqtt-image
+              repository: ghcr.io/koenkk/zigbee2mqtt
+              tag: 2.1.1
+            env:
+              ZIGBEE2MQTT_DATA: /config
+              ZIGBEE2MQTT_CONFIG_ADVANCED_LAST_SEEN: ISO_8601
+              ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_API: false
+              ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_AVAILABILITY_PAYLOAD: false
+              ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_LEVEL: info # debug
+              ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_OUTPUT: '["console"]'
+              ZIGBEE2MQTT_CONFIG_AVAILABILITY_ACTIVE_TIMEOUT: 60
+              ZIGBEE2MQTT_CONFIG_AVAILABILITY_PASSIVE_TIMEOUT: 2000
+              ZIGBEE2MQTT_CONFIG_DEVICE_OPTIONS_LEGACY: false
+              ZIGBEE2MQTT_CONFIG_DEVICE_OPTIONS_RETAIN: true
+              ZIGBEE2MQTT_CONFIG_EXPERIMENTAL_NEW_API: true
+              ZIGBEE2MQTT_CONFIG_FRONTEND_PORT: &port 8080
+              ZIGBEE2MQTT_CONFIG_FRONTEND_URL: "https://zigbee.${SECRET_DOMAIN}"
+              ZIGBEE2MQTT_CONFIG_HOMEASSISTANT_ENABLED: true
+              ZIGBEE2MQTT_CONFIG_HOMEASSISTANT_DISCOVERY_TOPIC: homeassistant
+              ZIGBEE2MQTT_CONFIG_HOMEASSISTANT_EXPERIMENTAL_EVENT_ENTITIES: true
+              ZIGBEE2MQTT_CONFIG_HOMEASSISTANT_LEGACY_ENTITY_ATTRIBUTES: false
+              ZIGBEE2MQTT_CONFIG_HOMEASSISTANT_LEGACY_TRIGGERS: false
+              ZIGBEE2MQTT_CONFIG_HOMEASSISTANT_STATUS_TOPIC: homeassistant/status
+              ZIGBEE2MQTT_CONFIG_MQTT_BASE_TOPIC: zigbee2mqtt
+              ZIGBEE2MQTT_CONFIG_MQTT_INCLUDE_DEVICE_INFORMATION: true
+              ZIGBEE2MQTT_CONFIG_MQTT_KEEPALIVE: 60
+              ZIGBEE2MQTT_CONFIG_MQTT_REJECT_UNAUTHORIZED: true
+              ZIGBEE2MQTT_CONFIG_PERMIT_JOIN: false
+              ZIGBEE2MQTT_CONFIG_SERIAL_ADAPTER: ember
+              ZIGBEE2MQTT_CONFIG_SERIAL_BAUDRATE: 115200
+              ZIGBEE2MQTT_CONFIG_SERIAL_DISABLE_LED: false
+            envFrom:
+              - secretRef:
+                  name: zigbee2mqtt-secret
+            resources:
+              requests:
+                cpu: 50m
+              limits:
+                memory: 384Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+          code-server:
+            image: &code-server-image
+              repository: ghcr.io/coder/code-server
+              tag: 4.96.4
+            args: [
+              "--auth", "none",
+              "--disable-telemetry",
+              "--disable-update-check",
+              "--user-data-dir", "/config/.vscode",
+              "--extensions-dir", "/config/.vscode",
+              "--port", "8081",
+              "/config"
+            ]
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
+        initContainers:
+          emqx-init:
+            image: &emqx-init-image
+              repository: ghcr.io/prehor/emqx-init
+              tag: 1.0.0
+            envFrom:
+              - secretRef:
+                  name: zigbee2mqtt-emqx-init
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 64Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+      preload-images:
+        type: job
+        annotations:
+          helm.sh/hook: pre-install,pre-upgrade
+        job:
+          ttlSecondsAfterFinished: 600
+        containers:
+          zigbee2mqtt:
+            image: *zigbee2mqtt-image
+            command: ['/bin/sleep']
+            args: ['10']
+          code-server:
+            image: *code-server-image
+            command: ['/bin/sleep']
+            args: ['10']
+          emqx-init:
+            image: *emqx-init-image
+            command: ['/bin/sleep']
+            args: ['10']
+        serviceAccount:
+          name: default
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: zigbee2mqtt
+        ports:
+          http:
+            primary: true
+            port: *port
+          code-server:
+            port: 8081
+    ingress:
+      app:
+        className: internal
+        annotations:
+          nginx.ingress.kubernetes.io/rewrite-target: /$1
+        hosts:
+          - host: &host "zigbee.${SECRET_DOMAIN}"
+            paths:
+              - path: /(.*)
+                service:
+                  identifier: app
+                  port: http
+              - path: /code/(.*)
+                service:
+                  identifier: app
+                  port: code-server
+        tls:
+          - hosts:
+              - *host
+    persistence:
+      config:
+        existingClaim: zigbee2mqtt
+        advancedMounts:
+          zigbee2mqtt:
+            app:
+              - path: /config
+            code-server:
+              - path: /config
+      tmp:
+        type: emptyDir
