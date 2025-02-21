@@ -18,6 +18,8 @@ rules:
       - home-assistant-emqx-secret
       - home-assistant-postgres-dburl
       - home-assistant-postgres-recorder-secret
+      - zigbee2mqtt-emqx-init
+      - zigbee2mqtt-secret
     verbs:
       - get
       - list
