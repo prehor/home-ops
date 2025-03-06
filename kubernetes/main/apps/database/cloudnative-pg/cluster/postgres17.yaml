@@ -23,10 +23,12 @@ spec:
       # https://openzfs.github.io/openzfs-docs/Performance%20and%20Tuning/Workload%20Tuning.html#postgresql
       # https://vadosware.io/post/everything-ive-seen-on-optimizing-postgres-on-zfs-on-linux/
       # https://kubeblocks.io/blog/A-testing-report-for-optimizing-PG-performance-on-Kubernetes
-      full_page_writes: "off"
       recovery_prefetch: "try"
       wal_init_zero: "off"
       wal_recycle: "off"
+      # pg_rewind requires full_page_writes on
+      # https://www.postgresql.org/docs/current/app-pgrewind.html
+      full_page_writes: "on"
   nodeMaintenanceWindow:
     inProgress: false
     reusePVC: true
