@@ -2,7 +2,27 @@
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   packageRules: [
     {
-      description: ['Dragonfly Operator Group'],
+      description: 'Cert-Manager Group',
+      groupName: 'Cert-Manager',
+      matchDatasources: ['docker'],
+      matchPackageNames: ['/cert-manager/'],
+      group: {
+        commitMessageTopic: '{{{groupName}}} group',
+      },
+      separateMinorPatch: true
+    },
+    {
+      description: 'Cilium Group',
+      groupName: 'Cilium',
+      matchDatasources: ['docker'],
+      matchPackageNames: ['/cilium/'],
+      group: {
+        commitMessageTopic: '{{{groupName}}} group',
+      },
+      separateMinorPatch: true
+    },
+    {
+      description: 'Dragonfly Operator Group',
       groupName: 'Dragonfly Operator',
       matchPackagePatterns: ['dragonfly(?:db)?.operator'],
       matchDatasources: ['docker', 'github-releases'],
@@ -12,7 +32,17 @@
       separateMinorPatch: true
     },
     {
-      description: ['Flux Group'],
+      description: 'External Secrets Operator Group',
+      groupName: 'External Secrets Operator',
+      matchDatasources: ['docker'],
+      matchPackageNames: ['/external-secrets/'],
+      group: {
+        commitMessageTopic: '{{{groupName}}} group',
+      },
+      separateMinorPatch: true
+    },
+    {
+      description: 'Flux Group',
       groupName: 'Flux',
       matchPackagePatterns: ['fluxcd'],
       matchDatasources: ['docker', 'github-tags'],
@@ -23,7 +53,7 @@
       separateMinorPatch: true
     },
     {
-      description: ['Rook-Ceph Group'],
+      description: 'Rook-Ceph Group',
       groupName: 'Rook-Ceph',
       matchPackagePatterns: ['rook.ceph'],
       matchDatasources: ['helm'],
@@ -33,7 +63,7 @@
       separateMinorPatch: true
     },
     {
-      description: ['System Upgrade Controller Group'],
+      description: 'System Upgrade Controller Group',
       groupName: 'System Upgrade Controller',
       matchPackagePatterns: ['system-upgrade-controller'],
       matchDatasources: ['docker', 'github-releases'],

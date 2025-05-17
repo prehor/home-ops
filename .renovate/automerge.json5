@@ -2,11 +2,12 @@
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   packageRules: [
     {
-      description: ['Auto merge Github Actions'],
+      description: 'Auto merge Github Actions',
       matchManagers: ['github-actions'],
       automerge: true,
       automergeType: 'branch',
       ignoreTests: true,
+      minimumReleaseAge: "3 days",
       matchUpdateTypes: ['minor', 'patch']
     }
   ]
