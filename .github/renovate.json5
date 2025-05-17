@@ -1,63 +1,70 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    "docker:enableMajor",
-    ":disableRateLimiting",
-    ":dependencyDashboard",
-    ":semanticCommits",
-    ":automergeBranch",
-    ":timezone(Europe/Prague)",
-    "github>prehor/home-ops//.github/renovate/automerge.json5",
-    "github>prehor/home-ops//.github/renovate/clusters.json5",
-    "github>prehor/home-ops//.github/renovate/commit-messages.json5",
-    "github>prehor/home-ops//.github/renovate/custom-managers.json5",
-    "github>prehor/home-ops//.github/renovate/groups.json5",
-    "github>prehor/home-ops//.github/renovate/labels.json5",
-    "github>prehor/home-ops//.github/renovate/versioning.json5"
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: [
+    'config:recommended',
+    'docker:enableMajor',
+    ':disableRateLimiting',
+    ':dependencyDashboard',
+    ':semanticCommits',
+    ':automergeBranch',
+    ':timezone(Europe/Prague)',
+    'github>prehor/home-ops//.github/renovate/automerge.json5',
+    'github>prehor/home-ops//.github/renovate/clusters.json5',
+    'github>prehor/home-ops//.github/renovate/commit-messages.json5',
+    'github>prehor/home-ops//.github/renovate/custom-managers.json5',
+    'github>prehor/home-ops//.github/renovate/groups.json5',
+    'github>prehor/home-ops//.github/renovate/labels.json5',
+    'github>prehor/home-ops//.github/renovate/versioning.json5',
   ],
-  "dependencyDashboard": true,
-  "dependencyDashboardTitle": "Renovate Dashboard 🤖",
-  "suppressNotifications": ["prEditedNotification", "prIgnoreNotification"],
-  "rebaseWhen": "conflicted",
-  "schedule": ["on friday and saturday"],
-  "ignorePaths": ["**/*.sops.*"],
-  "flux": {
-    "fileMatch": [
-      "(^|/)ansible/.+\\.ya?ml$",
-      "(^|/)kubernetes/.+\\.ya?ml$"
-    ]
+  dependencyDashboard: true,
+  dependencyDashboardTitle: 'Renovate Dashboard 🤖',
+  suppressNotifications: [
+    'prEditedNotification',
+    'prIgnoreNotification',
+  ],
+  rebaseWhen: 'conflicted',
+  schedule: [
+    'on friday and saturday',
+  ],
+  ignorePaths: [
+    '**/*.sops.*',
+  ],
+  flux: {
+    managerFilePatterns: [
+      '/(^|/)ansible/.+\\.ya?ml$/',
+      '/(^|/)kubernetes/.+\\.ya?ml$/',
+    ],
   },
-  "helm-values": {
-    "fileMatch": [
-      "(^|/)ansible/.+\\.ya?ml$",
-      "(^|/)kubernetes/.+\\.ya?ml$"
-    ]
+  'helm-values': {
+    managerFilePatterns: [
+      '/(^|/)ansible/.+\\.ya?ml$/',
+      '/(^|/)kubernetes/.+\\.ya?ml$/',
+    ],
   },
-  "helmfile": {
-    "fileMatch": [
-      "(^|/)helmfile\\.ya?ml$"
-    ]
+  helmfile: {
+    managerFilePatterns: [
+      '/(^|/)helmfile\\.ya?ml$/',
+    ],
   },
-  "kubernetes": {
-    "fileMatch": [
-      "(^|/)ansible/.+\\.ya?ml$",
-      "(^|/)kubernetes/.+\\.ya?ml$"
-    ]
+  kubernetes: {
+    managerFilePatterns: [
+      '/(^|/)ansible/.+\\.ya?ml$/',
+      '/(^|/)kubernetes/.+\\.ya?ml$/',
+    ],
   },
-  "kustomize": {
-    "fileMatch": [
-      "(^|/)kustomization\\.ya?ml$"
-    ]
+  kustomize: {
+    managerFilePatterns: [
+      '/(^|/)kustomization\\.ya?ml$/',
+    ],
   },
-  "pip_requirements": {
-    "fileMatch": [
-      "(^|/)[\\w-]*requirements(-\\w+)?\\.(txt|pip)$"
-    ]
+  pip_requirements: {
+    managerFilePatterns: [
+      '/(^|/)[\\w-]*requirements(-\\w+)?\\.(txt|pip)$/',
+    ],
   },
-  "ansible-galaxy": {
-    "fileMatch": [
-      "(^|/)(galaxy|requirements)(\\.ansible)?\\.ya?ml$"
-    ]
-  }
+  'ansible-galaxy': {
+    managerFilePatterns: [
+      '/(^|/)(galaxy|requirements)(\\.ansible)?\\.ya?ml$/',
+    ],
+  },
 }
