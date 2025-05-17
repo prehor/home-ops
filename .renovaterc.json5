@@ -3,11 +3,8 @@
   extends: [
     'config:recommended',
     'docker:enableMajor',
-    ':disableRateLimiting',
-    ':dependencyDashboard',
-    ':semanticCommits',
-    ':automergeBranch',
-    ':timezone(Europe/Prague)',
+    'helpers:pinGitHubActionDigests',
+    'github>prehor/home-ops//.renovate/allowedversions.json5',
     'github>prehor/home-ops//.renovate/automerge.json5',
     'github>prehor/home-ops//.renovate/clusters.json5',
     'github>prehor/home-ops//.renovate/commit-messages.json5',
@@ -15,6 +12,12 @@
     'github>prehor/home-ops//.renovate/groups.json5',
     'github>prehor/home-ops//.renovate/labels.json5',
     'github>prehor/home-ops//.renovate/versioning.json5',
+    ':automergeBranch',
+    ':dependencyDashboard',
+    ':disableRateLimiting',
+    ':gitSignOff',
+    ':semanticCommits',
+    ':timezone(Europe/Prague)',
   ],
   dependencyDashboard: true,
   dependencyDashboardTitle: 'Renovate Dashboard 🤖',
@@ -65,6 +68,6 @@
   'ansible-galaxy': {
     managerFilePatterns: [
       '/(^|/)(galaxy|requirements)(\\.ansible)?\\.ya?ml$/',
-    ],
-  },
+    ]
+  }
 }
