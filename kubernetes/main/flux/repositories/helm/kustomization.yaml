@@ -14,7 +14,6 @@ resources:
   - ./ingress-nginx.yaml
   - ./k8s-gateway.yaml
   - ./k8tz.yaml
-  - ./jetstack.yaml
   - ./metrics-server.yaml
   - ./openebs-zfs-localpv.yaml
   - ./openebs.yaml
