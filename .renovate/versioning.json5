@@ -2,11 +2,6 @@
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   packageRules: [
     {
-      description: 'Pin Docker versions',
-      matchDatasources: ['docker'],
-      pinDigests: true
-    },
-    {
       description: 'Use custom versioning for k3s',
       matchDatasources: ['github-releases'],
       versioning: 'regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?<compatibility>\\+k.s)\\.?(?<build>\\d+)$',
