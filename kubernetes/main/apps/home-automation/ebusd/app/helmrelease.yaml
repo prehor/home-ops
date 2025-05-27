@@ -93,6 +93,7 @@ spec:
                 memory: 1Gi
               limits:
                 memory: 1Gi
+          # TODO: https://coder.com/docs/code-server/guide#prefixing-absproxyport-with-a-path
           code-server:
             image: &code-server-image
               repository: ghcr.io/coder/code-server
@@ -102,7 +103,7 @@ spec:
               - --user-data-dir=/config/.vscode
               - --extensions-dir=/config/.vscode
               - --port=80
-              - /config"
+              - /config
             envFrom:
               - secretRef:
                   name: ebusd-secret
