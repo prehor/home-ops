@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/refs/heads/main/upgrade.cattle.io/plan_v1.json
 apiVersion: upgrade.cattle.io/v1
 kind: Plan
 metadata:
@@ -31,6 +32,7 @@ spec:
     - key: CriticalAddonsOnly
       operator: Exists
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/refs/heads/main/upgrade.cattle.io/plan_v1.json
 apiVersion: upgrade.cattle.io/v1
 kind: Plan
 metadata:
