@@ -5,7 +5,6 @@ kind: Kustomization
 resources:
   - ./backube.yaml
   - ./bjw-s.yaml
-  - ./cilium.yaml
   - ./cloudnative-pg.yaml
   - ./cluster-proportional-autoscaler.yaml
   - ./descheduler.yaml
