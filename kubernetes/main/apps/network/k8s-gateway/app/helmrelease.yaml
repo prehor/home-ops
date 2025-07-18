@@ -30,8 +30,8 @@ spec:
         containers:
           app:
             image:
-              repository: quay.io/oriedge/k8s_gateway
-              tag: v0.4.0
+              repository: ghcr.io/k8s-gateway/k8s_gateway
+              tag: 1.5.1
             args: ["-conf", "/etc/coredns/Corefile"]
             probes:
               liveness:
@@ -63,6 +63,7 @@ spec:
             .:1053 {
               k8s_gateway rx.cz {
                 apex k8s-gateway.network
+                resources Ingress
                 ttl 1
               }
               errors
@@ -118,4 +119,3 @@ spec:
             nodePort: 30584
     serviceAccount:
       create: true
-
