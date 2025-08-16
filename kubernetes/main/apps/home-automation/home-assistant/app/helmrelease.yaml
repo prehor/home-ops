@@ -174,11 +174,11 @@ spec:
               <<: *emqx-init-image
             command: ['/bin/sleep']
             args: ['10']
-          recorder-init:
-            image:
-              <<: *recorder-init-image
-            command: ['/bin/sleep']
-            args: ['10']
+          # recorder-init:
+          #   image:
+          #     <<: *recorder-init-image
+          #   command: ['/bin/sleep']
+          #   args: ['10']
           config-init:
             image:
               <<: *config-init-image
