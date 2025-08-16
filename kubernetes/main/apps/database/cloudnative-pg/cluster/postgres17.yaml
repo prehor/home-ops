@@ -3,6 +3,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
+  # When changing the cluster name, it is necessary to edit its name in scheduledbackup.yaml as well.
   name: postgres17
 spec:
   instances: 3
