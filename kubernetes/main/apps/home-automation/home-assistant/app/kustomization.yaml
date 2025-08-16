@@ -8,7 +8,7 @@ resources:
   - ./config-secret.sops.yaml
   - ./emqx-init-secret.yaml
   - ./emqx-secret.sops.yaml
-  - ./postgres-dburl-secret.yaml
-  - ./postgres-recorder-initdb-secret.yaml
-  - ./postgres-recorder-secret.sops.yaml
+  # - ./postgres-dburl-secret.yaml
+  # - ./postgres-recorder-initdb-secret.yaml
+  # - ./postgres-recorder-secret.sops.yaml
   - ./secret.yaml

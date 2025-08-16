@@ -24,8 +24,8 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-    - name: postgres-operator
-      namespace: database
+    # - name: postgres-operator
+    #   namespace: database
     - name: emqx-operator
       namespace: database
     - name: external-secrets
@@ -119,13 +119,13 @@ spec:
             envFrom:
               - secretRef:
                   name: home-assistant-emqx-init
-          recorder-init:
-            image: &recorder-init-image
-              repository: ghcr.io/onedr0p/postgres-init
-              tag: 16
-            envFrom:
-              - secretRef:
-                  name: home-assistant-postgres-recorder-initdb
+          # recorder-init:
+          #   image: &recorder-init-image
+          #     repository: ghcr.io/onedr0p/postgres-init
+          #     tag: 16
+          #   envFrom:
+          #     - secretRef:
+          #         name: home-assistant-postgres-recorder-initdb
           config-init:
             image: &config-init-image
               repository: docker.io/alpine/git

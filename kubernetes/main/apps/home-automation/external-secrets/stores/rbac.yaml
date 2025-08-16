@@ -16,8 +16,8 @@ rules:
       - ebusd-config-secret
       - home-assistant-config-secret
       - home-assistant-emqx-secret
-      - home-assistant-postgres-dburl
-      - home-assistant-postgres-recorder-secret
+      # - home-assistant-postgres-dburl
+      # - home-assistant-postgres-recorder-secret
       - zigbee2mqtt-config-secret
     verbs:
       - get
