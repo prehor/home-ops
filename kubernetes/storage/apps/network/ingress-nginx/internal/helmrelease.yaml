@@ -60,6 +60,7 @@ spec:
         proxy-buffer-size: 16k
         proxy-busy-buffers-size: 32k
         ssl-protocols: TLSv1.3 TLSv1.2
+        use-forwarded-headers: "true"
       metrics:
         enabled: true
         serviceMonitor:
