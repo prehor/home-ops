@@ -39,7 +39,7 @@ spec:
           app:
             image: &zigbee2mqtt-image
               repository: ghcr.io/koenkk/zigbee2mqtt
-              tag: 2.7.1
+              tag: 2.7.2
             # Temporarily disable actual start for debugging purposes
             # command: ['/bin/sleep']
             # args: ['10000']
