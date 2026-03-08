@@ -21,8 +21,8 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 5Gi
-      VOLSYNC_CACHE_CAPACITY: 2Gi
-      VOLSYNC_UNLOCK: "2025-08-31-A"
+      VOLSYNC_CACHE_CAPACITY: 5Gi
+      VOLSYNC_UNLOCK: "2026-03-08-A"
   prune: true
   sourceRef:
     kind: GitRepository
