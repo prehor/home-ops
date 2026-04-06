@@ -50,7 +50,7 @@
         matrix: ${{ steps.extract-images.outputs.images }}
       steps:
         - name: Setup Homebrew
-          uses: Homebrew/actions/setup-homebrew@master
+          uses: Homebrew/actions/setup-homebrew@fc695c54c2032716dd4cedd007489c8e32fc8a5d # master
 
         - name: Setup Workflow Tools
           shell: bash
