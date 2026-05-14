@@ -5,6 +5,12 @@
       matchDatasources: ['docker'],
       matchPackageNames: ['/postgresql/'],
       allowedVersions: '<=17',
+    },
+    {
+      description: 'emqx-operator 2.3.0 and higher require emqx 5.9 which does not support clustering',
+      matchDatasources: ['helm'],
+      matchPackageNames: ['emqx-operator'],
+      allowedVersions: '<2.3.0',
     }
   ]
 }
