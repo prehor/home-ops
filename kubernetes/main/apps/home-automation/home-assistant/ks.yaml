@@ -22,7 +22,7 @@ spec:
       APP: *app
       VOLSYNC_CAPACITY: 5Gi
       VOLSYNC_CACHE_CAPACITY: 5Gi
-      VOLSYNC_UNLOCK: "2026-03-08-A"
+      VOLSYNC_UNLOCK: "2026-06-07"
   prune: true
   sourceRef:
     kind: GitRepository
