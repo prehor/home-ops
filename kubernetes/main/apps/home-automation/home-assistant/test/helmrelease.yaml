@@ -34,7 +34,7 @@ spec:
           app:
             image: &home-assistant-image
               repository: ghcr.io/home-assistant/home-assistant
-              tag: 2026.6.1@sha256:59aa8824955c9db491b75d2eebe42bd68494f80c2ec69ec0d66d9dae37d37514
+              tag: 2026.7.1@sha256:f73512ba4fe06bb4d57636fe3578d0820cdec46f81e8f837ab59e451662ff3cb
             probes:
               liveness: &probes
                 enabled: true
