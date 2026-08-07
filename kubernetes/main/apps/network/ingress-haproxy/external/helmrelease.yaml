@@ -28,16 +28,11 @@ spec:
   values:
     fullnameOverride: *app
     controller:
-      name: controller
       replicaCount: 1
       ingressClass: external
       ingressClassResource:
         name: external
         default: false
-      allowPrivilegedPorts: true
-      containerPort:
-        http: 80
-        https: 443
       service:
         annotations:
           external-dns.alpha.kubernetes.io/hostname: "${SECRET_CLUSTER_NAME}.${SECRET_DOMAIN}"
