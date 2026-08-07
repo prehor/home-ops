@@ -11,6 +11,7 @@ resources:
   - ./descheduler.yaml
   - ./emqx.yaml
   - ./external-dns.yaml
+  - ./haproxytech.yaml
   - ./ingress-nginx.yaml
   - ./k8s-gateway.yaml
   - ./k8tz.yaml
