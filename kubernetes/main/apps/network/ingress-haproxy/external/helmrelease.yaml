@@ -28,7 +28,8 @@ spec:
   values:
     fullnameOverride: *app
     controller:
-      replicaCount: 2
+      name: controller
+      replicaCount: 1
       ingressClass: external
       ingressClassResource:
         name: external
