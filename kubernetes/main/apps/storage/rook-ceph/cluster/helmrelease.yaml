@@ -43,6 +43,19 @@ spec:
       bdev_async_discard = true
 
     cephClusterSpec:
+      # TODO: Ceph 19.2.6 requires aes256k keys, but we cannot use them with the CSI driver, so we need to use aes for now. Once the kernel is upgraded to v7, we can switch CSI driver keys to aes256k.
+      skipUpgradeChecks: true
+
+      security:
+        cephx:
+          daemon:
+            keyType: aes256k
+            keyRotationPolicy: KeyGeneration
+            keyGeneration: 1
+          csi:
+            # TODO: Ceph 19.2.6 requires aes256k keys, but we cannot use them with the CSI driver, so we need to use aes for now. Once the kernel is upgraded to v7, we can switch CSI driver keys to aes256k.
+            keyType: aes
+
       crashCollector:
         disable: false
 
