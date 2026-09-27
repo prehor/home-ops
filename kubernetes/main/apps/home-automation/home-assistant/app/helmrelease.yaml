@@ -53,7 +53,7 @@ spec:
           app:
             image: &home-assistant-image
               repository: ghcr.io/home-assistant/home-assistant
-              tag: 2026.8.2@sha256:56690a89c79a0de98035e1719f8324a92d5859c1192ff45adb0230ea81cb42a5
+              tag: 2026.9.4@sha256:3e6710a7ab2a61311d9d899b719f6c3657791c63e8f4942cec4ebc42401d6b76
             envFrom:
               - secretRef:
                   name: home-assistant-secret
