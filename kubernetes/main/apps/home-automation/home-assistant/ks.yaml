@@ -20,9 +20,9 @@ spec:
   postBuild:
     substitute:
       APP: *app
-      VOLSYNC_CAPACITY: 5Gi
-      VOLSYNC_CACHE_CAPACITY: 5Gi
-      VOLSYNC_UNLOCK: "2026-06-07"
+      VOLSYNC_CAPACITY: 50Gi
+      VOLSYNC_CACHE_CAPACITY: 50Gi
+      VOLSYNC_UNLOCK: "2026-10-11-001"
   prune: true
   sourceRef:
     kind: GitRepository
